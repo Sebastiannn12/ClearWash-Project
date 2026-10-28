@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\MembershipCategory;
+use App\Models\MembershipLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -13,8 +15,8 @@ class MemberController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'category' => ['nullable', Rule::in(['Individual', 'Corporate'])],
-            'membership_level' => ['nullable', Rule::in(['Basic', 'Plus', 'Premium'])],
+            'category' => ['nullable', Rule::exists('membership_categories', 'name')->where('is_active', true)],
+            'membership_level' => ['nullable', Rule::exists('membership_levels', 'name')->where('is_active', true)],
             'status' => ['nullable', Rule::in(['active', 'inactive'])],
         ]);
 
@@ -49,12 +51,13 @@ class MemberController extends Controller
             'totalMembers' => Member::count(),
             'activeMembers' => Member::where('is_active', true)->count(),
             'inactiveMembers' => Member::where('is_active', false)->count(),
+            ...$this->membershipOptions(),
         ]);
     }
 
     public function create()
     {
-        return view('members.create');
+        return view('members.create', $this->membershipOptions());
     }
 
     public function store(Request $request)
@@ -71,7 +74,10 @@ class MemberController extends Controller
 
     public function edit(Member $member)
     {
-        return view('members.edit', compact('member'));
+        return view('members.edit', [
+            'member' => $member,
+            ...$this->membershipOptions(),
+        ]);
     }
 
     public function update(Request $request, Member $member)
@@ -111,11 +117,19 @@ class MemberController extends Controller
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
-            'category' => ['required', Rule::in(['Individual', 'Corporate'])],
-            'membership_level' => ['required', Rule::in(['Basic', 'Plus', 'Premium'])],
+            'category' => ['required', Rule::exists('membership_categories', 'name')->where('is_active', true)],
+            'membership_level' => ['required', Rule::exists('membership_levels', 'name')->where('is_active', true)],
             'address' => ['nullable', 'string', 'max:1000'],
             'joined_on' => ['required', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
+    }
+
+    private function membershipOptions(): array
+    {
+        return [
+            'categories' => MembershipCategory::where('is_active', true)->orderBy('id')->pluck('name'),
+            'levels' => MembershipLevel::where('is_active', true)->orderBy('id')->pluck('name'),
+        ];
     }
 }

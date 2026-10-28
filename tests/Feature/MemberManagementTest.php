@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Member;
+use App\Models\MembershipLevel;
+use App\Models\MembershipCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,8 +19,8 @@ class MemberManagementTest extends TestCase
             'last_name' => 'Reyes',
             'email' => 'alex@example.com',
             'phone' => '09171234567',
-            'category' => 'Individual',
-            'membership_level' => 'Plus',
+            'category' => 'Regular',
+            'membership_level' => 'Silver',
             'joined_on' => now()->toDateString(),
         ], $overrides);
     }
@@ -63,12 +65,44 @@ class MemberManagementTest extends TestCase
         Member::create($this->memberData());
         Member::create($this->memberData([
             'first_name' => 'Mina', 'last_name' => 'Santos',
-            'category' => 'Corporate', 'membership_level' => 'Premium',
+            'category' => 'Corporate', 'membership_level' => 'Platinum',
             'email' => 'mina@example.com', 'is_active' => false,
         ]));
 
-        $this->get(route('members.index', ['search' => 'Alex Reyes', 'category' => 'Individual', 'membership_level' => 'Plus', 'status' => 'active']))
+        $this->get(route('members.index', ['search' => 'Alex Reyes', 'category' => 'Regular', 'membership_level' => 'Silver', 'status' => 'active']))
             ->assertOk()->assertSee('Alex Reyes')->assertDontSee('Mina Santos');
+    }
+
+    public function test_membership_setup_lists_options_and_updates_level_details(): void
+    {
+        $this->get(route('membership-settings.index'))
+            ->assertOk()
+            ->assertSee('Student')
+            ->assertSee('Senior Citizen')
+            ->assertSee('Platinum')
+            ->assertSee('Consolidated billing');
+
+        $basic = MembershipLevel::where('name', 'Basic')->firstOrFail();
+        $this->assertSame('299.00', $basic->fee);
+        $this->assertSame(30, $basic->validity_days);
+        $this->assertStringContainsString('2 standard car washes', $basic->benefits);
+
+        $corporate = MembershipCategory::where('name', 'Corporate')->firstOrFail();
+        $this->assertStringContainsString('vehicle record tracking', $corporate->benefits);
+
+        $level = MembershipLevel::where('name', 'Gold')->firstOrFail();
+
+        $this->patch(route('membership-settings.levels.update', $level), [
+            'fee' => 799.50,
+            'validity_days' => 90,
+            'benefits' => 'Three premium washes and priority service.',
+        ])->assertRedirect(route('membership-settings.index'));
+
+        $this->assertDatabaseHas('membership_levels', [
+            'id' => $level->id,
+            'fee' => 799.50,
+            'validity_days' => 90,
+        ]);
     }
 
     public function test_member_can_be_permanently_deleted(): void
