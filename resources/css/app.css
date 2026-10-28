@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    html {
+        text-rendering: optimizeLegibility;
+    }
+
+    body {
+        font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+        letter-spacing: -0.006em;
+    }
+
+    h1,
+    h2,
+    h3 {
+        letter-spacing: -0.025em;
+        text-wrap: balance;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font: inherit;
+        letter-spacing: -0.006em;
+    }
+}
