@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('paymets', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('membership_transaction_id')
@@ -30,8 +30,7 @@ return new class extends Migration
 
             $table->text('notes')->nullable();
 
-            $table->timestamps();s
-            
+            $table->timestamps();
         });
     }
 
@@ -40,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('paymets');
+        Schema::dropIfExists('payments');
     }
 };
