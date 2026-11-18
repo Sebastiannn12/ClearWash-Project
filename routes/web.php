@@ -3,6 +3,7 @@
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MembershipSettingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MembershipTransactionController;
 
 Route::get('/', [MemberController::class, 'index']);
 
@@ -18,3 +19,6 @@ Route::get('/membership-setup', [MembershipSettingController::class, 'index'])
     ->name('membership-settings.index');
 Route::patch('/membership-setup/levels/{membershipLevel}', [MembershipSettingController::class, 'updateLevel'])
     ->name('membership-settings.levels.update');
+
+Route::resource('transactions', MembershipTransactionController::class)
+    ->only(['index', 'create', 'store', 'show']);

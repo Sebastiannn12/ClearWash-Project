@@ -19,6 +19,10 @@
                     <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 19a4 4 0 0 0-8 0m8 0H8m8 0h3a2 2 0 0 0 2-2v-1a4 4 0 0 0-3-3.87M8 19H5a2 2 0 0 1-2-2v-1a4 4 0 0 1 3-3.87M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
                     Members
                 </a>
+                <a href="{{ route('transactions.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors {{ request()->routeIs('transactions.*') ? 'bg-white/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12M6 12h12M6 17h7M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/></svg>
+                    Transactions
+                </a>
                 <a href="{{ route('membership-settings.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors {{ request()->routeIs('membership-settings.*') ? 'bg-white/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
                     <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m6-15H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6"/></svg>
                     Membership setup
@@ -32,9 +36,11 @@
                 <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
                     <div class="flex items-center gap-3">
                         <span class="flex size-9 items-center justify-center rounded-lg bg-[#0F172A] font-bold text-white lg:hidden">C</span>
-                        <span class="text-sm font-medium text-slate-500">Workspace <span class="mx-2 text-slate-300">/</span> <span class="font-semibold text-slate-800">{{ request()->routeIs('membership-settings.*') ? 'Membership setup' : 'Members' }}</span></span>
+                        <span class="text-sm font-medium text-slate-500">Workspace <span class="mx-2 text-slate-300">/</span> <span class="font-semibold text-slate-800">{{ request()->routeIs('membership-settings.*') ? 'Membership setup' : (request()->routeIs('transactions.*') ? 'Transactions' : 'Members') }}</span></span>
                     </div>
-                    @if (! request()->routeIs('membership-settings.*'))
+                    @if (request()->routeIs('transactions.index'))
+                        <a href="{{ route('transactions.create') }}" class="hidden rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:inline-flex">+ Create Transaction</a>
+                    @elseif (request()->routeIs('members.*') || request()->routeIs('home'))
                         <a href="{{ route('members.create') }}" class="hidden rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:inline-flex">+ Add member</a>
                     @endif
                 </div>

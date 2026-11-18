@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
+use App\TransactionStatus;
+use App\TransactionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -62,7 +64,27 @@ class MemberController extends Controller
 
     public function store(Request $request)
     {
-        $member = DB::transaction(fn () => Member::create($this->validatedData($request)));
+        $validated = $this->validatedData($request);
+
+        $member = DB::transaction(function () use ($validated) {
+            $level = MembershipLevel::where('name', $validated['membership_level'])
+                ->where('is_active', true)
+                ->firstOrFail();
+
+            $member = Member::create($validated);
+
+            $member->membershipTransactions()->firstOrCreate(
+                ['type' => TransactionType::Application->value],
+                [
+                    'membership_level_id' => $level->id,
+                    'status' => TransactionStatus::Pending->value,
+                    'amount_due' => $level->fee,
+                    'validity_days' => $level->validity_days,
+                ],
+            );
+
+            return $member;
+        });
 
         return redirect()->route('members.show', $member)->with('success', 'Member registered successfully.');
     }
