@@ -91,6 +91,12 @@ class MemberController extends Controller
 
     public function show(Member $member)
     {
+        $member->load([
+            'membershipTransactions' => fn ($query) => $query
+                ->with(['membershipLevel', 'payments'])
+                ->latest(),
+        ]);
+
         return view('members.show', compact('member'));
     }
 
