@@ -8,8 +8,11 @@ use App\Models\MembershipLevel;
 use App\Models\MembershipTransaction;
 use App\TransactionStatus;
 use App\TransactionType;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class MembershipTransactionController extends Controller
@@ -94,7 +97,78 @@ class MembershipTransactionController extends Controller
             'payments',
         ]);
 
-        return view('transactions.show', compact('transaction'));
+        $totalPaid = (float) $transaction->payments->sum('amount');
+        $remainingBalance = max(0, (float) $transaction->amount_due - $totalPaid);
+        $paymentSubmissionToken = 'PAY-'.Str::uuid();
+
+        return view('transactions.show', compact(
+            'transaction',
+            'totalPaid',
+            'remainingBalance',
+            'paymentSubmissionToken',
+        ));
+    }
+
+    public function approve(MembershipTransaction $transaction): RedirectResponse
+    {
+        DB::transaction(function () use ($transaction): void {
+            $member = Member::query()->lockForUpdate()->findOrFail($transaction->member_id);
+            $lockedTransaction = MembershipTransaction::query()->lockForUpdate()->findOrFail($transaction->id);
+
+            if ($lockedTransaction->status !== TransactionStatus::Paid->value) {
+                throw ValidationException::withMessages(['status' => 'Only fully paid transactions can be approved.']);
+            }
+
+            if ($lockedTransaction->created_at->addDays(7)->lte(now())) {
+                throw ValidationException::withMessages(['status' => 'This transaction has passed its seven-day approval window.']);
+            }
+
+            $dueInCents = (int) round((float) $lockedTransaction->amount_due * 100);
+            $paidInCents = (int) round((float) $lockedTransaction->payments()->sum('amount') * 100);
+
+            if ($paidInCents < $dueInCents) {
+                throw ValidationException::withMessages(['status' => 'The remaining balance must be paid before approval.']);
+            }
+
+            $start = now();
+
+            if ($lockedTransaction->type === TransactionType::Renewal->value) {
+                $existingExpiration = MembershipTransaction::query()
+                    ->where('member_id', $member->id)
+                    ->where('id', '!=', $lockedTransaction->id)
+                    ->whereNotNull('approved_at')
+                    ->max('expires_at');
+
+                if ($existingExpiration && $existingExpiration > $start->toDateTimeString()) {
+                    $start = Carbon::parse($existingExpiration);
+                }
+            }
+
+            $lockedTransaction->update([
+                'status' => TransactionStatus::Approve->value,
+                'approved_at' => now(),
+                'expires_at' => $start->addDays($lockedTransaction->validity_days),
+            ]);
+
+            $member->update(['membership_level' => $lockedTransaction->membershipLevel->name]);
+        });
+
+        return redirect()->route('transactions.show', $transaction)->with('success', 'Transaction approved.');
+    }
+
+    public function cancel(MembershipTransaction $transaction): RedirectResponse
+    {
+        DB::transaction(function () use ($transaction): void {
+            $lockedTransaction = MembershipTransaction::query()->lockForUpdate()->findOrFail($transaction->id);
+
+            if (! in_array($lockedTransaction->status, [TransactionStatus::Pending->value, TransactionStatus::Paid->value], true)) {
+                throw ValidationException::withMessages(['status' => 'Only Pending or Paid transactions can be cancelled.']);
+            }
+
+            $lockedTransaction->update(['status' => TransactionStatus::Cancelled->value]);
+        });
+
+        return redirect()->route('transactions.show', $transaction)->with('success', 'Transaction cancelled. Payment history was retained.');
     }
 
     /**

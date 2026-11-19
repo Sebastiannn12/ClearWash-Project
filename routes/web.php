@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MembershipSettingController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MembershipTransactionController;
+use App\Http\Controllers\PaymentController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MemberController::class, 'index']);
 
@@ -22,3 +23,11 @@ Route::patch('/membership-setup/levels/{membershipLevel}', [MembershipSettingCon
 
 Route::resource('transactions', MembershipTransactionController::class)
     ->only(['index', 'create', 'store', 'show']);
+
+Route::post('/transactions/{transaction}/payments', [PaymentController::class, 'store'])
+    ->name('transactions.payments.store');
+
+Route::patch('/transactions/{transaction}/approve', [MembershipTransactionController::class, 'approve'])
+    ->name('transactions.approve');
+Route::patch('/transactions/{transaction}/cancel', [MembershipTransactionController::class, 'cancel'])
+    ->name('transactions.cancel');
