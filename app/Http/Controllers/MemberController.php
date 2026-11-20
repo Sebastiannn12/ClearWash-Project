@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
+use App\Models\Payment;
 use App\TransactionStatus;
 use App\TransactionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
@@ -113,7 +115,7 @@ class MemberController extends Controller
 
     public function update(Request $request, Member $member)
     {
-        $member->update($this->validatedData($request));
+        $member->update($this->validatedData($request, $member));
 
         return redirect()->route('members.show', $member)->with('success', 'Member information updated.');
     }
@@ -132,13 +134,84 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('success', 'Member reactivated.');
     }
 
-    public function forceDelete(Member $member)
+    public function softDelete(Member $member)
     {
         $memberName = $member->full_name;
         $member->delete();
 
         return redirect()->route('members.index')
             ->with('success', "{$memberName} was moved to Deleted Members.");
+    }
+
+    public function forceDelete(Member $member)
+    {
+        abort_unless($member->trashed(), 404);
+
+        $memberName = $member->full_name;
+        $result = DB::transaction(function () use ($member): array {
+            $lockedMember = Member::withTrashed()->lockForUpdate()->findOrFail($member->id);
+            $transactions = $lockedMember->membershipTransactions()
+                ->lockForUpdate()
+                ->get();
+            $transactionIds = $transactions->modelKeys();
+
+            $transactionIdsWithPayments = $transactionIds === []
+                ? collect()
+                : Payment::whereIn('membership_transaction_id', $transactionIds)
+                    ->pluck('membership_transaction_id')
+                    ->unique();
+
+            if ($transactionIdsWithPayments->isNotEmpty()) {
+                $references = $transactions
+                    ->whereIn('id', $transactionIdsWithPayments)
+                    ->pluck('reference_number')
+                    ->implode(', ');
+
+                return [
+                    'error' => "Permanent deletion blocked: transaction(s) {$references} contain recorded payments. Payment and financial history must be preserved.",
+                ];
+            }
+
+            $protectedStatuses = $transactions
+                ->whereNotIn('status', [
+                    TransactionStatus::Pending->value,
+                    TransactionStatus::Cancelled->value,
+                ])
+                ->pluck('status')
+                ->unique()
+                ->values();
+
+            if ($protectedStatuses->isNotEmpty()) {
+                $protectedTransactions = $transactions
+                    ->whereIn('status', $protectedStatuses)
+                    ->map(fn ($transaction) => "{$transaction->reference_number} ({$transaction->status})")
+                    ->implode(', ');
+
+                return [
+                    'error' => "Permanent deletion blocked: {$protectedTransactions}. Only payment-free Pending or Cancelled transactions may be deleted with a member.",
+                ];
+            }
+
+            $deletedTransactionCount = $transactions->count();
+            $lockedMember->membershipTransactions()->delete();
+            $lockedMember->forceDelete();
+
+            return ['deleted_transaction_count' => $deletedTransactionCount];
+        });
+
+        if (isset($result['error'])) {
+            return redirect()->route('members.index')
+                ->with('error', $result['error']);
+        }
+
+        $transactionMessage = $result['deleted_transaction_count'] === 1
+            ? ' One payment-free Pending or Cancelled transaction was also deleted.'
+            : ($result['deleted_transaction_count'] > 1
+                ? " {$result['deleted_transaction_count']} payment-free Pending or Cancelled transactions were also deleted."
+                : '');
+
+        return redirect()->route('members.index')
+            ->with('success', "{$memberName} was permanently deleted.{$transactionMessage}");
     }
 
     public function restore(Member $member)
@@ -152,19 +225,78 @@ class MemberController extends Controller
             ->with('success', "{$memberName} was restored.");
     }
 
-    private function validatedData(Request $request): array
+    private function validatedData(Request $request, ?Member $member = null): array
     {
-        return $request->validate([
+        $request->merge([
+            'email' => Str::lower(trim((string) $request->input('email'))),
+            'phone' => trim((string) $request->input('phone')),
+        ]);
+
+        $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:30'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                function (string $attribute, mixed $value, $fail) use ($member): void {
+                    $duplicates = Member::withTrashed()
+                        ->whereRaw('LOWER(email) = ?', [Str::lower((string) $value)])
+                        ->when($member, fn ($query) => $query->where('id', '!=', $member->id))
+                        ->get();
+                    $duplicate = $duplicates->first(fn (Member $existingMember) => $existingMember->trashed())
+                        ?? $duplicates->first();
+
+                    if ($duplicate?->trashed()) {
+                        $fail('This email belongs to a deleted member. Restore that member from Deleted Members instead.');
+                    } elseif ($duplicate) {
+                        $fail('This email is already registered to another member.');
+                    }
+                },
+            ],
+            'phone' => [
+                'required',
+                'string',
+                'max:30',
+                'regex:/^\+?[0-9][0-9\s().-]*[0-9]$/',
+                function (string $attribute, mixed $value, $fail) use ($member): void {
+                    $normalizedPhone = $this->normalizePhone((string) $value);
+
+                    if (strlen($normalizedPhone) < 7 || strlen($normalizedPhone) > 15) {
+                        $fail('The phone number must contain between 7 and 15 digits.');
+
+                        return;
+                    }
+
+                    $duplicates = Member::withTrashed()
+                        ->when($member, fn ($query) => $query->where('id', '!=', $member->id))
+                        ->get(['id', 'phone', 'deleted_at'])
+                        ->filter(fn (Member $existingMember) => $this->normalizePhone($existingMember->phone) === $normalizedPhone);
+                    $duplicate = $duplicates->first(fn (Member $existingMember) => $existingMember->trashed())
+                        ?? $duplicates->first();
+
+                    if ($duplicate?->trashed()) {
+                        $fail('This phone number belongs to a deleted member. Restore that member from Deleted Members instead.');
+                    } elseif ($duplicate) {
+                        $fail('This phone number is already registered to another member.');
+                    }
+                },
+            ],
             'category' => ['required', Rule::exists('membership_categories', 'name')->where('is_active', true)],
             'membership_level' => ['required', Rule::exists('membership_levels', 'name')->where('is_active', true)],
             'address' => ['nullable', 'string', 'max:1000'],
             'joined_on' => ['required', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        $validated['phone'] = $this->normalizePhone($validated['phone']);
+
+        return $validated;
+    }
+
+    private function normalizePhone(string $phone): string
+    {
+        return preg_replace('/\D+/', '', $phone) ?? '';
     }
 
     private function membershipOptions(): array

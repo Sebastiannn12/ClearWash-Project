@@ -10,7 +10,10 @@ Route::get('/', [MemberController::class, 'index']);
 
 Route::patch('/members/{member}/reactivate', [MemberController::class, 'reactivate'])
     ->name('members.reactivate');
+Route::delete('/members/{member}/delete', [MemberController::class, 'softDelete'])
+    ->name('members.delete');
 Route::delete('/members/{member}/permanent', [MemberController::class, 'forceDelete'])
+    ->withTrashed()
     ->name('members.force-delete');
 Route::patch('/members/{member}/restore', [MemberController::class, 'restore'])
     ->withTrashed()

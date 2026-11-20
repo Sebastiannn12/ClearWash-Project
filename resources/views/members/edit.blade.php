@@ -9,4 +9,8 @@
         @include('members._form')
         <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6"><button class="rounded-lg bg-[#1E3A8A] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900">Save changes</button><a href="{{ route('members.show', $member) }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">Cancel</a></div>
     </form>
+    <div class="mt-4 max-w-4xl">
+        <button type="button" onclick="document.getElementById('soft-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50">Delete member</button>
+    </div>
+    @include('members._delete-modal', ['member' => $member, 'permanent' => false])
 @endsection

@@ -12,6 +12,10 @@
         <a href="{{ route('members.create') }}" class="inline-flex rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:hidden">+ Add member</a>
     </div>
 
+    @if (session('error'))
+        <div role="alert" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">{{ session('error') }}</div>
+    @endif
+
     <div class="mt-8 grid gap-4 sm:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-700">Total members</p><p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ number_format($totalMembers) }}</p></div>
         <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p class="text-sm font-semibold text-slate-700">Active members</p><p class="mt-2 text-3xl font-bold tracking-tight text-blue-950">{{ number_format($activeMembers) }}</p></div>
@@ -62,11 +66,7 @@
                                                 <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Reactivate</button>
                                             </form>
                                         @endunless
-                                        <form method="POST" action="{{ route('members.force-delete', $member) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" onclick="return confirm('Move this member to Deleted Members? You can restore them later.')" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50">Delete</button>
-                                        </form>
+                                        <button type="button" onclick="document.getElementById('soft-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -77,6 +77,9 @@
             <div class="border-t border-slate-200 px-5 py-4">{{ $members->links() }}</div>
         @endif
     </section>
+    @foreach ($members as $member)
+        @include('members._delete-modal', ['member' => $member, 'permanent' => false])
+    @endforeach
 
     <section class="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="deleted-members-heading">
         <div class="border-b border-slate-200 p-5 sm:p-6">
@@ -113,12 +116,15 @@
                                 </td>
                                 <td class="px-5 py-4 font-mono text-xs text-slate-600">{{ $member->membership_number }}</td>
                                 <td class="px-5 py-4 text-slate-700">{{ $member->deleted_at->format('M j, Y g:i A') }}</td>
-                                <td class="px-6 py-4 text-right">
-                                    <form method="POST" action="{{ route('members.restore', $member) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Restore</button>
-                                    </form>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <form method="POST" action="{{ route('members.restore', $member) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Restore</button>
+                                        </form>
+                                        <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50">Delete permanently</button>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -127,4 +133,7 @@
             </div>
         @endif
     </section>
+    @foreach ($deletedMembers as $member)
+        @include('members._delete-modal', ['member' => $member, 'permanent' => true])
+    @endforeach
 @endsection
