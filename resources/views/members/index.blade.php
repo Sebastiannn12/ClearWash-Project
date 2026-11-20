@@ -9,7 +9,7 @@
             <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Members</h1>
             <p class="mt-2 text-sm font-medium text-slate-600">Manage member profiles and membership details in one place.</p>
         </div>
-        <a href="{{ route('members.create') }}" class="inline-flex rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:hidden">+ Add member</a>
+        <a href="{{ route('members.create') }}" class="inline-flex items-center rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">+ Add Member</a>
     </div>
 
     @if (session('error'))
@@ -57,16 +57,16 @@
                                 <td class="px-5 py-4"><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $member->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $member->is_active ? 'Active' : 'Inactive' }}</span></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('members.show', $member) }}" class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50">View</a>
-                                        <a href="{{ route('members.edit', $member) }}" class="rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-800 transition-colors hover:bg-blue-50">Edit</a>
+                                        <a href="{{ route('members.show', $member) }}" class="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200">View</a>
+                                        <a href="{{ route('members.edit', $member) }}" class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800 transition-colors hover:bg-blue-100">Edit</a>
                                         @unless ($member->is_active)
                                             <form method="POST" action="{{ route('members.reactivate', $member) }}">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Reactivate</button>
+                                                <button type="submit" class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">Reactivate</button>
                                             </form>
                                         @endunless
-                                        <button type="button" onclick="document.getElementById('soft-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50">Delete</button>
+                                        <button type="button" onclick="document.getElementById('soft-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -121,9 +121,9 @@
                                         <form method="POST" action="{{ route('members.restore', $member) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Restore</button>
+                                            <button type="submit" class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">Restore</button>
                                         </form>
-                                        <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50">Delete permanently</button>
+                                        <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100">Delete permanently</button>
                                     </div>
                                 </td>
                             </tr>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Add member')
 @section('content')
-    <a href="{{ route('members.index') }}" class="text-sm font-semibold text-blue-900 hover:underline">← Back to members</a>
+    <a href="{{ route('members.index') }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">← Back to members</a>
     <div class="mt-5"><p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-800">Member management</p><h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Register a member</h1><p class="mt-2 text-sm font-medium text-slate-600">Enter their details below. A unique membership number is assigned automatically.</p></div>
     <form method="POST" action="{{ route('members.store') }}" class="mt-8 max-w-4xl rounded-xl border border-slate-200 bg-white p-5 shadow-sm [&_input]:font-medium [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
         @csrf

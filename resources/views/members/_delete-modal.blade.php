@@ -19,7 +19,7 @@
             <form method="POST" action="{{ $permanent ? route('members.force-delete', $member) : route('members.delete', $member) }}" class="w-full sm:w-auto">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="w-full rounded-lg bg-red-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-red-800">{{ $permanent ? 'Delete Permanently' : 'Confirm Delete' }}</button>
+                <button type="submit" class="w-full rounded-lg border border-red-600 bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:border-red-700 hover:bg-red-700">{{ $permanent ? 'Delete Permanently' : 'Confirm Delete' }}</button>
             </form>
         </div>
     </div>

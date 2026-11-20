@@ -40,8 +40,6 @@
                     </div>
                     @if (request()->routeIs('transactions.index'))
                         <a href="{{ route('transactions.create') }}" class="hidden rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:inline-flex">+ Create Transaction</a>
-                    @elseif (request()->routeIs('members.*') || request()->routeIs('home'))
-                        <a href="{{ route('members.create') }}" class="hidden rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 sm:inline-flex">+ Add member</a>
                     @endif
                 </div>
             </header>

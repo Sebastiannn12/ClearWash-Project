@@ -7,7 +7,7 @@
         <div role="alert" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">{{ session('error') }}</div>
     @endif
 
-    <a href="{{ route('members.index') }}" class="text-sm font-medium text-blue-800 hover:underline">← Back to members</a>
+    <a href="{{ route('members.index') }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">← Back to members</a>
 
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -18,7 +18,10 @@
                 <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $member->is_active ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-200 text-slate-800' }}">{{ $member->is_active ? 'Active' : 'Inactive' }}</span>
             </div>
         </div>
-        <a href="{{ route('members.edit', $member) }}" class="rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900">Edit profile</a>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ route('members.edit', $member) }}" class="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-800">Edit Profile</a>
+            <a href="{{ route('members.create') }}" class="inline-flex items-center rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-900">+ Add Member</a>
+        </div>
     </div>
 
     <div class="mt-8 grid max-w-5xl gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(250px,1fr)]">
