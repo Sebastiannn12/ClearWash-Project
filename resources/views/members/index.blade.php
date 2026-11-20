@@ -65,7 +65,7 @@
                                         <form method="POST" action="{{ route('members.force-delete', $member) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" onclick="return confirm('Permanently delete this member? This action cannot be undone.')" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50">Delete</button>
+                                            <button type="submit" onclick="return confirm('Move this member to Deleted Members? You can restore them later.')" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50">Delete</button>
                                         </form>
                                     </div>
                                 </td>
@@ -75,6 +75,56 @@
                 </table>
             </div>
             <div class="border-t border-slate-200 px-5 py-4">{{ $members->links() }}</div>
+        @endif
+    </section>
+
+    <section class="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="deleted-members-heading">
+        <div class="border-b border-slate-200 p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h2 id="deleted-members-heading" class="text-lg font-bold text-slate-950">Deleted Members</h2>
+                    <p class="mt-1 text-sm font-medium text-slate-600">Restore members without losing their transaction or payment history.</p>
+                </div>
+                <span class="text-sm font-semibold text-slate-600">{{ $deletedMembers->count() }} deleted</span>
+            </div>
+        </div>
+
+        @if ($deletedMembers->isEmpty())
+            <div class="px-6 py-10 text-center">
+                <p class="text-sm font-medium text-slate-500">No deleted members.</p>
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[720px] text-left text-sm">
+                    <thead class="border-b border-blue-100 bg-blue-50/70 text-xs font-bold uppercase tracking-[0.08em] text-blue-950">
+                        <tr>
+                            <th scope="col" class="px-6 py-3.5">Member</th>
+                            <th scope="col" class="px-5 py-3.5">Membership no.</th>
+                            <th scope="col" class="px-5 py-3.5">Deleted</th>
+                            <th scope="col" class="px-6 py-3.5 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach ($deletedMembers as $member)
+                            <tr class="hover:bg-slate-50/70">
+                                <td class="px-6 py-4">
+                                    <div class="font-semibold text-slate-900">{{ $member->full_name }}</div>
+                                    <div class="mt-0.5 text-xs text-slate-500">{{ $member->email ?: $member->phone }}</div>
+                                </td>
+                                <td class="px-5 py-4 font-mono text-xs text-slate-600">{{ $member->membership_number }}</td>
+                                <td class="px-5 py-4 text-slate-700">{{ $member->deleted_at->format('M j, Y g:i A') }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <form method="POST" action="{{ route('members.restore', $member) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Restore</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </section>
 @endsection

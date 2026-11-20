@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Member extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'first_name',
         'last_name',
@@ -25,6 +28,7 @@ class Member extends Model
         return [
             'joined_on' => 'date',
             'is_active' => 'boolean',
+            'deleted_at' => 'datetime',
         ];
     }
 

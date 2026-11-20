@@ -12,6 +12,9 @@ Route::patch('/members/{member}/reactivate', [MemberController::class, 'reactiva
     ->name('members.reactivate');
 Route::delete('/members/{member}/permanent', [MemberController::class, 'forceDelete'])
     ->name('members.force-delete');
+Route::patch('/members/{member}/restore', [MemberController::class, 'restore'])
+    ->withTrashed()
+    ->name('members.restore');
 Route::resource('members', MemberController::class)->except(['destroy']);
 Route::delete('/members/{member}', [MemberController::class, 'destroy'])
     ->name('members.destroy');

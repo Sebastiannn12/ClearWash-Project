@@ -50,6 +50,9 @@ class MemberController extends Controller
 
         return view('members.index', [
             'members' => $members,
+            'deletedMembers' => Member::onlyTrashed()
+                ->orderByDesc('deleted_at')
+                ->get(),
             'totalMembers' => Member::count(),
             'activeMembers' => Member::where('is_active', true)->count(),
             'inactiveMembers' => Member::where('is_active', false)->count(),
@@ -132,25 +135,21 @@ class MemberController extends Controller
     public function forceDelete(Member $member)
     {
         $memberName = $member->full_name;
-        $deleted = DB::transaction(function () use ($member): bool {
-            $lockedMember = Member::query()->lockForUpdate()->findOrFail($member->id);
-
-            if ($lockedMember->membershipTransactions()->exists()) {
-                return false;
-            }
-
-            $lockedMember->delete();
-
-            return true;
-        });
-
-        if (! $deleted) {
-            return redirect()->route('members.show', $member)
-                ->with('error', 'This member has transaction or payment history and cannot be permanently deleted. You can deactivate the member instead.');
-        }
+        $member->delete();
 
         return redirect()->route('members.index')
-            ->with('success', "{$memberName} was permanently deleted.");
+            ->with('success', "{$memberName} was moved to Deleted Members.");
+    }
+
+    public function restore(Member $member)
+    {
+        abort_unless($member->trashed(), 404);
+
+        $memberName = $member->full_name;
+        $member->restore();
+
+        return redirect()->route('members.index')
+            ->with('success', "{$memberName} was restored.");
     }
 
     private function validatedData(Request $request): array
