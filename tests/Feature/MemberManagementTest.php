@@ -3,8 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Member;
-use App\Models\MembershipLevel;
 use App\Models\MembershipCategory;
+use App\Models\MembershipLevel;
+use App\Models\MembershipTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -114,5 +115,60 @@ class MemberManagementTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertDatabaseMissing('members', ['id' => $member->id]);
+    }
+
+    public function test_member_with_a_transaction_cannot_be_permanently_deleted(): void
+    {
+        $member = Member::create($this->memberData());
+        $level = MembershipLevel::where('name', 'Silver')->firstOrFail();
+        $transaction = MembershipTransaction::create([
+            'member_id' => $member->id,
+            'membership_level_id' => $level->id,
+            'type' => 'Application',
+            'status' => 'Pending',
+            'amount_due' => $level->fee,
+            'validity_days' => $level->validity_days,
+        ]);
+
+        $this->delete(route('members.force-delete', $member))
+            ->assertRedirect(route('members.show', $member))
+            ->assertSessionHas('error', 'This member has transaction or payment history and cannot be permanently deleted. You can deactivate the member instead.');
+
+        $this->get(route('members.show', $member))
+            ->assertOk()
+            ->assertSee('cannot be permanently deleted');
+        $this->assertModelExists($member);
+        $this->assertModelExists($transaction);
+
+        $this->delete(route('members.destroy', $member))->assertRedirect();
+        $this->assertFalse($member->fresh()->is_active);
+    }
+
+    public function test_member_with_payment_history_cannot_be_permanently_deleted(): void
+    {
+        $member = Member::create($this->memberData());
+        $level = MembershipLevel::where('name', 'Silver')->firstOrFail();
+        $transaction = MembershipTransaction::create([
+            'member_id' => $member->id,
+            'membership_level_id' => $level->id,
+            'type' => 'Application',
+            'status' => 'Paid',
+            'amount_due' => $level->fee,
+            'validity_days' => $level->validity_days,
+        ]);
+        $payment = $transaction->payments()->create([
+            'payment_reference' => 'PAY-001',
+            'amount' => $level->fee,
+            'method' => 'Cash',
+            'paid_at' => now(),
+        ]);
+
+        $this->delete(route('members.force-delete', $member))
+            ->assertRedirect(route('members.show', $member))
+            ->assertSessionHas('error');
+
+        $this->assertModelExists($member);
+        $this->assertModelExists($transaction);
+        $this->assertModelExists($payment);
     }
 }

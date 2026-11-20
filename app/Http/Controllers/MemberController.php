@@ -132,7 +132,22 @@ class MemberController extends Controller
     public function forceDelete(Member $member)
     {
         $memberName = $member->full_name;
-        $member->delete();
+        $deleted = DB::transaction(function () use ($member): bool {
+            $lockedMember = Member::query()->lockForUpdate()->findOrFail($member->id);
+
+            if ($lockedMember->membershipTransactions()->exists()) {
+                return false;
+            }
+
+            $lockedMember->delete();
+
+            return true;
+        });
+
+        if (! $deleted) {
+            return redirect()->route('members.show', $member)
+                ->with('error', 'This member has transaction or payment history and cannot be permanently deleted. You can deactivate the member instead.');
+        }
 
         return redirect()->route('members.index')
             ->with('success', "{$memberName} was permanently deleted.");

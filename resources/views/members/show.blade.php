@@ -3,6 +3,10 @@
 @section('title', $member->full_name)
 
 @section('content')
+    @if (session('error'))
+        <div role="alert" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">{{ session('error') }}</div>
+    @endif
+
     <a href="{{ route('members.index') }}" class="text-sm font-medium text-blue-800 hover:underline">← Back to members</a>
 
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
