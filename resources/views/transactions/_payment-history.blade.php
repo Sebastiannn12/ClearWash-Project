@@ -5,8 +5,8 @@
     </div>
 @else
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-600">
+        <table class="min-w-[680px] divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-brand-canvas text-xs font-bold uppercase tracking-wide text-slate-600">
                 <tr>
                     <th class="px-5 py-3 sm:px-7">Reference</th>
                     <th class="px-5 py-3">Method</th>
@@ -16,7 +16,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-800">
                 @foreach ($payments as $payment)
-                    <tr>
+                    <tr class="transition-colors hover:bg-brand-canvas/70">
                         <td class="whitespace-nowrap px-5 py-4 font-mono font-semibold sm:px-7">{{ $payment->payment_reference ?: '—' }}</td>
                         <td class="whitespace-nowrap px-5 py-4 font-semibold">{{ $payment->method }}</td>
                         <td class="whitespace-nowrap px-5 py-4 font-medium">{{ $payment->paid_at->format('M j, Y g:i A') }}</td>

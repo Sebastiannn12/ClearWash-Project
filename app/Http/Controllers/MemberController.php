@@ -19,19 +19,20 @@ class MemberController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
-            'category' => ['nullable', Rule::exists('membership_categories', 'name')->where('is_active', true)],
-            'membership_level' => ['nullable', Rule::exists('membership_levels', 'name')->where('is_active', true)],
+            'membership_category_id' => ['nullable', Rule::exists('membership_categories', 'id')->where('is_active', true)],
+            'membership_level_id' => ['nullable', Rule::exists('membership_levels', 'id')->where('is_active', true)],
             'status' => ['nullable', Rule::in(['active', 'inactive'])],
         ]);
 
         $members = Member::query()
+            ->with(['membershipCategory', 'membershipLevel'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhere('membership_number', 'like', "%{$search}%")
-                        ->orWhere('category', 'like', "%{$search}%")
-                        ->orWhere('membership_level', 'like', "%{$search}%");
+                        ->orWhereHas('membershipCategory', fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('membershipLevel', fn ($query) => $query->where('name', 'like', "%{$search}%"));
 
                     $nameParts = preg_split('/\s+/', trim($search), 2);
                     if (count($nameParts) === 2) {
@@ -42,8 +43,8 @@ class MemberController extends Controller
                     }
                 });
             })
-            ->when($filters['category'] ?? null, fn ($query, $value) => $query->where('category', $value))
-            ->when($filters['membership_level'] ?? null, fn ($query, $value) => $query->where('membership_level', $value))
+            ->when($filters['membership_category_id'] ?? null, fn ($query, $value) => $query->where('membership_category_id', $value))
+            ->when($filters['membership_level_id'] ?? null, fn ($query, $value) => $query->where('membership_level_id', $value))
             ->when($filters['status'] ?? null, fn ($query, $value) => $query->where('is_active', $value === 'active'))
             ->orderByDesc('created_at')
             ->orderByDesc('id')
@@ -52,9 +53,6 @@ class MemberController extends Controller
 
         return view('members.index', [
             'members' => $members,
-            'deletedMembers' => Member::onlyTrashed()
-                ->orderByDesc('deleted_at')
-                ->get(),
             'totalMembers' => Member::count(),
             'activeMembers' => Member::where('is_active', true)->count(),
             'inactiveMembers' => Member::where('is_active', false)->count(),
@@ -72,9 +70,7 @@ class MemberController extends Controller
         $validated = $this->validatedData($request);
 
         $member = DB::transaction(function () use ($validated) {
-            $level = MembershipLevel::where('name', $validated['membership_level'])
-                ->where('is_active', true)
-                ->firstOrFail();
+            $level = MembershipLevel::findOrFail($validated['membership_level_id']);
 
             $member = Member::create($validated);
 
@@ -97,12 +93,28 @@ class MemberController extends Controller
     public function show(Member $member)
     {
         $member->load([
+            'membershipCategory',
+            'membershipLevel',
             'membershipTransactions' => fn ($query) => $query
                 ->with(['membershipLevel', 'payments'])
                 ->latest(),
         ]);
 
         return view('members.show', compact('member'));
+    }
+
+    public function history(Member $member)
+    {
+        $member->load(['membershipCategory', 'membershipLevel', 'membershipTransactions' => fn ($query) => $query->with(['membershipLevel', 'payments'])->latest()]);
+
+        return view('members.history', compact('member'));
+    }
+
+    public function print(Member $member)
+    {
+        $member->load(['membershipCategory', 'membershipLevel']);
+
+        return view('members.print', compact('member'));
     }
 
     public function edit(Member $member)
@@ -134,22 +146,11 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('success', 'Member reactivated.');
     }
 
-    public function softDelete(Member $member)
-    {
-        $memberName = $member->full_name;
-        $member->delete();
-
-        return redirect()->route('members.index')
-            ->with('success', "{$memberName} was moved to Deleted Members.");
-    }
-
     public function forceDelete(Member $member)
     {
-        abort_unless($member->trashed(), 404);
-
         $memberName = $member->full_name;
         $result = DB::transaction(function () use ($member): array {
-            $lockedMember = Member::withTrashed()->lockForUpdate()->findOrFail($member->id);
+            $lockedMember = Member::query()->lockForUpdate()->findOrFail($member->id);
             $transactions = $lockedMember->membershipTransactions()
                 ->lockForUpdate()
                 ->get();
@@ -214,17 +215,6 @@ class MemberController extends Controller
             ->with('success', "{$memberName} was permanently deleted.{$transactionMessage}");
     }
 
-    public function restore(Member $member)
-    {
-        abort_unless($member->trashed(), 404);
-
-        $memberName = $member->full_name;
-        $member->restore();
-
-        return redirect()->route('members.index')
-            ->with('success', "{$memberName} was restored.");
-    }
-
     private function validatedData(Request $request, ?Member $member = null): array
     {
         $request->merge([
@@ -240,16 +230,11 @@ class MemberController extends Controller
                 'email',
                 'max:255',
                 function (string $attribute, mixed $value, $fail) use ($member): void {
-                    $duplicates = Member::withTrashed()
+                    $duplicates = Member::query()
                         ->whereRaw('LOWER(email) = ?', [Str::lower((string) $value)])
                         ->when($member, fn ($query) => $query->where('id', '!=', $member->id))
                         ->get();
-                    $duplicate = $duplicates->first(fn (Member $existingMember) => $existingMember->trashed())
-                        ?? $duplicates->first();
-
-                    if ($duplicate?->trashed()) {
-                        $fail('This email belongs to a deleted member. Restore that member from Deleted Members instead.');
-                    } elseif ($duplicate) {
+                    if ($duplicates->isNotEmpty()) {
                         $fail('This email is already registered to another member.');
                     }
                 },
@@ -268,28 +253,28 @@ class MemberController extends Controller
                         return;
                     }
 
-                    $duplicates = Member::withTrashed()
+                    $duplicates = Member::query()
                         ->when($member, fn ($query) => $query->where('id', '!=', $member->id))
-                        ->get(['id', 'phone', 'deleted_at'])
+                        ->get(['id', 'phone'])
                         ->filter(fn (Member $existingMember) => $this->normalizePhone($existingMember->phone) === $normalizedPhone);
-                    $duplicate = $duplicates->first(fn (Member $existingMember) => $existingMember->trashed())
-                        ?? $duplicates->first();
-
-                    if ($duplicate?->trashed()) {
-                        $fail('This phone number belongs to a deleted member. Restore that member from Deleted Members instead.');
-                    } elseif ($duplicate) {
+                    if ($duplicates->isNotEmpty()) {
                         $fail('This phone number is already registered to another member.');
                     }
                 },
             ],
-            'category' => ['required', Rule::exists('membership_categories', 'name')->where('is_active', true)],
-            'membership_level' => ['required', Rule::exists('membership_levels', 'name')->where('is_active', true)],
+            'membership_category_id' => ['required', Rule::exists('membership_categories', 'id')->where('is_active', true)],
+            'membership_level_id' => ['required', Rule::exists('membership_levels', 'id')->where('is_active', true)],
             'address' => ['nullable', 'string', 'max:1000'],
             'joined_on' => ['required', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        $category = MembershipCategory::findOrFail($validated['membership_category_id']);
+        $level = MembershipLevel::findOrFail($validated['membership_level_id']);
+
         $validated['phone'] = $this->normalizePhone($validated['phone']);
+        $validated['category'] = $category->name;
+        $validated['membership_level'] = $level->name;
 
         return $validated;
     }
@@ -302,8 +287,8 @@ class MemberController extends Controller
     private function membershipOptions(): array
     {
         return [
-            'categories' => MembershipCategory::where('is_active', true)->orderBy('id')->pluck('name'),
-            'levels' => MembershipLevel::where('is_active', true)->orderBy('id')->pluck('name'),
+            'categories' => MembershipCategory::where('is_active', true)->orderBy('id')->get(['id', 'name']),
+            'levels' => MembershipLevel::where('is_active', true)->orderBy('id')->get(['id', 'name']),
         ];
     }
 }

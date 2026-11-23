@@ -6,6 +6,11 @@
 @theme {
     --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-brand-sidebar: #291c24;
+    --color-brand-primary: #623547;
+    --color-brand-accent: #a9677d;
+    --color-brand-canvas: #f9f4f5;
+    --color-brand-border: #ebdde3;
 }
 
 @layer base {
@@ -16,6 +21,11 @@
     body {
         font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
         letter-spacing: -0.006em;
+    }
+
+    ::selection {
+        background: color-mix(in srgb, var(--color-brand-accent) 32%, transparent);
+        color: var(--color-brand-sidebar);
     }
 
     h1,

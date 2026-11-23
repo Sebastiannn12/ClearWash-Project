@@ -3,23 +3,22 @@
 @section('title', 'Create transaction')
 
 @section('content')
-    <a href="{{ route('transactions.index') }}" class="text-sm font-semibold text-blue-900 hover:underline">← Back to transactions</a>
+    <a href="{{ route('transactions.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-accent"><svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>Back to transactions</a>
 
     <div class="mt-5">
-        <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-800">Transaction processing</p>
-        <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Create a transaction</h1>
-        <p class="mt-2 text-sm font-medium text-slate-600">Start a membership application or renewal for an existing member.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Create a transaction</h1>
+        <p class="mt-3 text-sm font-medium leading-6 text-slate-600 sm:text-base">Start a membership application or renewal for an existing member.</p>
     </div>
 
-    <form method="POST" action="{{ route('transactions.store') }}" class="mt-8 max-w-4xl rounded-xl border border-slate-200 bg-white p-5 shadow-sm [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
+    <form method="POST" action="{{ route('transactions.store') }}" class="mt-8 max-w-4xl rounded-2xl border border-brand-border bg-white p-5 [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
         @csrf
 
-        <div class="mb-7 border-b border-slate-100 pb-5">
+        <div class="mb-7 border-b border-brand-border/70 pb-5">
             <h2 class="text-lg font-bold text-slate-950">Transaction details</h2>
             <p class="mt-1 text-sm font-medium text-slate-600">Fields marked * are required.</p>
         </div>
 
-        @php($fieldClass = 'mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-100')
+        @php($fieldClass = 'mt-2 w-full rounded-xl border border-brand-border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 focus:border-brand-primary focus:ring-3 focus:ring-brand-border')
 
         <div class="grid gap-6 sm:grid-cols-2">
             <div class="sm:col-span-2">
@@ -27,7 +26,7 @@
                 <select id="member_id" name="member_id" required class="{{ $fieldClass }}">
                     <option value="">Select member</option>
                     @foreach ($members as $member)
-                        <option value="{{ $member->id }}" data-membership-level="{{ $member->membership_level }}" @selected((string) old('member_id') === (string) $member->id)>
+                        <option value="{{ $member->id }}" data-membership-level-id="{{ $member->membership_level_id }}" @selected((string) old('member_id') === (string) $member->id)>
                             {{ $member->full_name }}{{ $member->membership_number ? ' · '.$member->membership_number : '' }}
                         </option>
                     @endforeach
@@ -51,8 +50,8 @@
                 @error('membership_level_id')
                     <p class="mt-1 text-xs text-red-700">{{ $message }}</p>
                 @enderror
-                <div id="plan-summary" class="mt-3 hidden rounded-lg border border-blue-100 bg-blue-50 px-3.5 py-3" aria-live="polite">
-                    <p class="text-xs font-bold uppercase tracking-wide text-blue-800">Selected plan</p>
+                <div id="plan-summary" class="mt-3 hidden rounded-lg border border-brand-border bg-brand-accent/10 px-3.5 py-3" aria-live="polite">
+                    <p class="text-xs font-bold uppercase tracking-wide text-brand-primary">Selected plan</p>
                     <p class="mt-1 text-sm font-semibold text-slate-800"><span id="plan-fee"></span> · <span id="plan-validity"></span></p>
                 </div>
             </div>
@@ -78,9 +77,9 @@
             </div>
         </div>
 
-        <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
-            <button type="submit" class="rounded-lg bg-[#1E3A8A] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900">Create transaction</button>
-            <a href="{{ route('transactions.index') }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">Cancel</a>
+        <div class="mt-8 flex flex-col-reverse gap-3 border-t border-brand-border/70 pt-6 sm:flex-row">
+            <a href="{{ route('transactions.index') }}" class="rounded-xl border border-brand-border px-5 py-2.5 text-center text-sm font-semibold text-slate-800 transition-[background-color,transform] duration-150 hover:bg-brand-canvas active:scale-[0.98]">Cancel</a>
+            <button type="submit" class="rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Create transaction</button>
         </div>
     </form>
 
@@ -92,8 +91,6 @@
             const planFee = document.getElementById('plan-fee');
             const planValidity = document.getElementById('plan-validity');
             const hasOldLevel = @json(old('membership_level_id') !== null);
-
-            const normalizeLevelName = (name) => name.trim().toLocaleLowerCase();
 
             const updatePlanSummary = () => {
                 const selectedLevel = levelSelect.options[levelSelect.selectedIndex];
@@ -117,21 +114,18 @@
 
             const selectMemberLevel = () => {
                 const selectedMember = memberSelect.options[memberSelect.selectedIndex];
-                const registeredLevel = selectedMember?.dataset.membershipLevel;
+                const registeredLevelId = selectedMember?.dataset.membershipLevelId;
 
-                if (! registeredLevel) {
+                if (! registeredLevelId) {
                     levelSelect.value = '';
                     updatePlanSummary();
 
                     return;
                 }
 
-                const matchingLevel = Array.from(levelSelect.options).find((option) => {
-                    return option.dataset.levelName
-                        && normalizeLevelName(option.dataset.levelName) === normalizeLevelName(registeredLevel);
-                });
-
-                levelSelect.value = matchingLevel?.value ?? '';
+                levelSelect.value = Array.from(levelSelect.options).some((option) => option.value === registeredLevelId)
+                    ? registeredLevelId
+                    : '';
                 updatePlanSummary();
             };
 

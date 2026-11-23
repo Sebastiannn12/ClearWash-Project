@@ -34,7 +34,7 @@ class MembershipTransactionController extends Controller
      */
     public function create()
     {
-        $members = Member::orderBy('first_name')->get();
+        $members = Member::with('membershipLevel')->orderBy('first_name')->get();
 
         $levels = MembershipLevel::where('is_active', true)->get();
 
@@ -150,7 +150,10 @@ class MembershipTransactionController extends Controller
                 'expires_at' => $start->addDays($lockedTransaction->validity_days),
             ]);
 
-            $member->update(['membership_level' => $lockedTransaction->membershipLevel->name]);
+            $member->update([
+                'membership_level_id' => $lockedTransaction->membership_level_id,
+                'membership_level' => $lockedTransaction->membershipLevel->name,
+            ]);
         });
 
         return redirect()->route('transactions.show', $transaction)->with('success', 'Transaction approved.');

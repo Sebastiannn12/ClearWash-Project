@@ -3,15 +3,21 @@
 @section('title', $transaction->reference_number)
 
 @section('content')
-    <a href="{{ route('transactions.index') }}" class="text-sm font-semibold text-blue-900 hover:underline">← Back to transactions</a>
+    @php($statusClass = match ($transaction->status) {
+        \App\TransactionStatus::Approve->value => 'bg-emerald-50 text-emerald-800',
+        \App\TransactionStatus::Paid->value => 'bg-blue-50 text-blue-800',
+        \App\TransactionStatus::Cancelled->value => 'bg-slate-100 text-slate-600',
+        \App\TransactionStatus::Expired->value => 'bg-red-50 text-red-800',
+        default => 'bg-amber-50 text-amber-800',
+    })
+    <a href="{{ route('transactions.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-accent"><svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6"/></svg>Back to transactions</a>
 
     <div class="mt-5 flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-800">Transaction details</p>
-            <h1 class="mt-2 font-mono text-3xl font-bold tracking-tight text-slate-950">{{ $transaction->reference_number }}</h1>
+            <h1 class="break-all font-mono text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{{ $transaction->reference_number }}</h1>
             <div class="mt-3 flex flex-wrap items-center gap-3">
                 <span class="text-sm font-semibold text-slate-600">{{ $transaction->type }}</span>
-                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-800">{{ $transaction->status }}</span>
+                <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span>
             </div>
         </div>
         @if (in_array($transaction->status, [\App\TransactionStatus::Pending->value, \App\TransactionStatus::Paid->value], true))
@@ -20,7 +26,7 @@
                     <form method="POST" action="{{ route('transactions.approve', $transaction) }}">
                         @csrf
                         @method('PATCH')
-                        <button class="rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900">Approve</button>
+                        <button class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Approve</button>
                     </form>
                 @endif
                 <form method="POST" action="{{ route('transactions.cancel', $transaction) }}" onsubmit="return confirm('Cancel this transaction? Payment history will be retained.')">
@@ -38,7 +44,7 @@
 
     <div class="mt-8 grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         <div class="space-y-6">
-            <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Transaction information</h2>
                 <dl class="mt-6 grid gap-x-6 gap-y-6 sm:grid-cols-2">
                     <div>
@@ -75,14 +81,14 @@
                     @endif
                 </dl>
 
-                <div class="mt-7 border-t border-slate-100 pt-6">
+                <div class="mt-7 border-t border-brand-border/70 pt-6">
                     <h3 class="text-sm font-bold text-slate-950">Notes</h3>
                     <p class="mt-2 whitespace-pre-line text-sm font-medium leading-6 text-slate-700">{{ $transaction->notes ?: 'No notes added.' }}</p>
                 </div>
             </section>
 
-            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+            <section class="overflow-hidden rounded-2xl border border-brand-border bg-white">
+                <div class="border-b border-brand-border/70 px-5 py-5 sm:px-7">
                     <h2 class="text-lg font-bold text-slate-950">Payment history</h2>
                     <p class="mt-1 text-sm font-medium text-slate-600">Payments recorded for this transaction.</p>
                 </div>
@@ -92,57 +98,20 @@
         </div>
 
         <aside class="space-y-6">
-            <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Payment summary</h2>
                 <dl class="mt-5 space-y-5">
                     <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Amount due</dt><dd class="text-sm font-bold text-slate-950">₱{{ number_format((float) $transaction->amount_due, 2) }}</dd></div>
                     <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Total paid</dt><dd class="text-sm font-bold text-emerald-700">₱{{ number_format($totalPaid, 2) }}</dd></div>
-                    <div class="flex items-center justify-between gap-4 border-t border-slate-100 pt-5"><dt class="text-sm font-bold text-slate-800">Remaining</dt><dd class="text-base font-bold text-slate-950">₱{{ number_format($remainingBalance, 2) }}</dd></div>
+                    <div class="flex items-center justify-between gap-4 border-t border-brand-border/70 pt-5"><dt class="text-sm font-bold text-slate-800">Remaining</dt><dd class="text-base font-bold text-slate-950">₱{{ number_format($remainingBalance, 2) }}</dd></div>
                 </dl>
             </section>
 
             @if ($transaction->status === \App\TransactionStatus::Pending->value && $remainingBalance > 0)
-                <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-                    <h2 class="text-lg font-bold text-slate-950">Record payment</h2>
-                    <p class="mt-1 text-sm font-medium text-slate-600">Add a full or partial payment.</p>
-
-                    <form method="POST" action="{{ route('transactions.payments.store', $transaction) }}" class="mt-5 space-y-5">
-                        @csrf
-                        <input type="hidden" name="payment_reference" value="{{ old('payment_reference', $paymentSubmissionToken) }}">
-
-                        @error('payment_reference')
-                            <p class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">{{ $message }}</p>
-                        @enderror
-
-                        <div>
-                            <label for="amount" class="text-sm font-bold text-slate-700">Amount <span class="text-red-600">*</span></label>
-                            <input id="amount" name="amount" type="number" min="0.01" max="{{ number_format($remainingBalance, 2, '.', '') }}" step="0.01" value="{{ old('amount') }}" required class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100">
-                            @error('amount')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
-                        </div>
-
-                        <div>
-                            <label for="method" class="text-sm font-bold text-slate-700">Method <span class="text-red-600">*</span></label>
-                            <select id="method" name="method" required class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100">
-                                <option value="">Select method</option>
-                                @foreach (['Cash', 'GCash', 'Card', 'Bank'] as $method)
-                                    <option value="{{ $method }}" @selected(old('method') === $method)>{{ $method }}</option>
-                                @endforeach
-                            </select>
-                            @error('method')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
-                        </div>
-
-                        <div>
-                            <label for="payment_notes" class="text-sm font-bold text-slate-700">Notes</label>
-                            <textarea id="payment_notes" name="notes" rows="2" maxlength="1000" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100">{{ old('notes') }}</textarea>
-                            @error('notes')<p class="mt-1 text-xs text-red-700">{{ $message }}</p>@enderror
-                        </div>
-
-                        <button type="submit" class="w-full rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900">Record payment</button>
-                    </form>
-                </section>
+                <a href="{{ route('payments.create', $transaction) }}" class="inline-flex rounded-xl bg-brand-primary px-4 py-3 text-sm font-bold text-white hover:bg-brand-sidebar">Record payment</a>
             @endif
 
-            <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Reference</h2>
                 <dl class="mt-5 space-y-5">
                     <div>

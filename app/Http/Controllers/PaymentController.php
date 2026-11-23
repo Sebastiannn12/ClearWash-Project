@@ -5,12 +5,42 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePaymentRequest;
 use App\Models\MembershipTransaction;
 use App\TransactionStatus;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class PaymentController extends Controller
 {
+    public function index(Request $request)
+    {
+        $search = $request->validate(['search' => ['nullable', 'string', 'max:100']])['search'] ?? null;
+        $transactions = MembershipTransaction::query()
+            ->with(['member', 'payments'])
+            ->where('status', TransactionStatus::Pending->value)
+            ->where('created_at', '>', now()->subDays(7))
+            ->when($search, fn ($query) => $query->where(function ($query) use ($search): void {
+                $query->where('reference_number', 'like', "%{$search}%")
+                    ->orWhereHas('member', fn ($memberQuery) => $memberQuery->where('first_name', 'like', "%{$search}%")->orWhere('last_name', 'like', "%{$search}%"));
+            }))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('payments.index', compact('transactions'));
+    }
+
+    public function create(MembershipTransaction $transaction)
+    {
+        $transaction->load(['member', 'payments']);
+        $remainingBalance = max(0, (float) $transaction->amount_due - (float) $transaction->payments->sum('amount'));
+        abort_unless($transaction->status === TransactionStatus::Pending->value && $remainingBalance > 0 && $transaction->created_at->addDays(7)->gt(now()), 404);
+        $paymentSubmissionToken = 'PAY-'.Str::uuid();
+
+        return view('payments.create', compact('transaction', 'remainingBalance', 'paymentSubmissionToken'));
+    }
+
     public function store(StorePaymentRequest $request, MembershipTransaction $transaction): RedirectResponse
     {
         $validated = $request->validated();

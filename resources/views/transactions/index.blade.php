@@ -5,14 +5,13 @@
 @section('content')
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="text-xs font-bold uppercase tracking-[0.15em] text-blue-800">Transaction processing</p>
-            <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Transactions</h1>
-            <p class="mt-2 text-sm font-medium text-slate-600">Review membership applications and renewals.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Transactions</h1>
+            <p class="mt-3 text-sm font-medium leading-6 text-slate-600 sm:text-base">Review membership applications and renewals.</p>
         </div>
-        <a href="{{ route('transactions.create') }}" class="rounded-lg bg-[#1E3A8A] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-900 sm:hidden">+ Create Transaction</a>
+        <a href="{{ route('transactions.create') }}" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98] sm:hidden">Create transaction</a>
     </div>
 
-    <section class="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <section class="mt-8 overflow-hidden rounded-2xl border border-brand-border bg-white">
         @if ($transactions->isEmpty())
             <div class="px-5 py-12 text-center sm:px-7">
                 <p class="text-sm font-semibold text-slate-700">No transactions yet.</p>
@@ -20,8 +19,8 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                    <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-600">
+                <table class="min-w-[860px] divide-y divide-slate-200 text-left text-sm">
+                    <thead class="bg-brand-canvas text-xs font-bold uppercase tracking-wide text-slate-600">
                         <tr>
                             <th class="px-5 py-3 sm:px-7">Reference</th>
                             <th class="px-5 py-3">Member</th>
@@ -34,12 +33,19 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-slate-800">
                         @foreach ($transactions as $transaction)
-                            <tr class="hover:bg-slate-50">
-                                <td class="whitespace-nowrap px-5 py-4 sm:px-7"><a href="{{ route('transactions.show', $transaction) }}" class="font-mono font-bold text-blue-900 hover:underline">{{ $transaction->reference_number }}</a></td>
+                            @php($statusClass = match ($transaction->status) {
+                                \App\TransactionStatus::Approve->value => 'bg-emerald-50 text-emerald-800',
+                                \App\TransactionStatus::Paid->value => 'bg-blue-50 text-blue-800',
+                                \App\TransactionStatus::Cancelled->value => 'bg-slate-100 text-slate-600',
+                                \App\TransactionStatus::Expired->value => 'bg-red-50 text-red-800',
+                                default => 'bg-amber-50 text-amber-800',
+                            })
+                            <tr class="hover:bg-brand-canvas">
+                                <td class="whitespace-nowrap px-5 py-4 sm:px-7"><a href="{{ route('transactions.show', $transaction) }}" class="font-mono font-bold text-brand-primary hover:underline">{{ $transaction->reference_number }}</a></td>
                                 <td class="whitespace-nowrap px-5 py-4 font-semibold">{{ $transaction->member->full_name }}</td>
                                 <td class="whitespace-nowrap px-5 py-4 font-medium">{{ $transaction->membershipLevel->name }}</td>
                                 <td class="whitespace-nowrap px-5 py-4 font-medium">{{ $transaction->type }}</td>
-                                <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-800">{{ $transaction->status }}</span></td>
+                                <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span></td>
                                 <td class="whitespace-nowrap px-5 py-4 text-right font-bold">₱{{ number_format((float) $transaction->amount_due, 2) }}</td>
                                 <td class="whitespace-nowrap px-5 py-4 text-right font-medium text-slate-600 sm:pr-7">{{ $transaction->created_at->format('M j, Y') }}</td>
                             </tr>
