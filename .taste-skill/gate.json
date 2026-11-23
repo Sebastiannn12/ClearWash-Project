@@ -1,0 +1,51 @@
+{
+ "start": "2026-11-23T16:20:12.035Z",
+ "round": 0,
+ "idle": 0,
+ "errors": 1,
+ "status": "error",
+ "history": [
+  {
+   "at": "2026-11-23T16:27:16.367Z",
+   "mode": "manual",
+   "status": "error",
+   "fails": 0,
+   "round": 0,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": null,
+  "url": "http://localhost:8000/login",
+  "root": null,
+  "kind": "software",
+  "category": "Car wash subscription management",
+  "primary": "Login",
+  "rounds": 3,
+  "start": "2026-11-23T16:20:12.035Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "fp": "ab08d2e902e1c278",
+ "page": "http://localhost:8000/login",
+ "found": {
+  "fails": [],
+  "warns": [],
+  "crashed": [
+   "the copy (the page showed no <main>, <section> or <h1> to lint)",
+   "consistency.mjs could not walk 1440, 390",
+   "check.mjs could not run (exit 2: check: timed out)"
+  ],
+  "seconds": {
+   "consistency": 1,
+   "layout": 240
+  }
+ },
+ "open": [],
+ "waived": [],
+ "warnCount": 0,
+ "note": "the copy (the page showed no <main>, <section> or <h1> to lint); consistency.mjs could not walk 1440, 390; check.mjs could not run (exit 2: check: timed out)",
+ "at": "2026-11-23T16:27:16.368Z"
+}

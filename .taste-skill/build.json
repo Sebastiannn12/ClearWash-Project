@@ -1,0 +1,11 @@
+{
+ "page": null,
+ "url": "http://localhost:8000/login",
+ "root": null,
+ "kind": "software",
+ "category": "Car wash subscription management",
+ "primary": "Login",
+ "rounds": 3,
+ "start": "2026-11-23T16:20:12.035Z",
+ "by": "gate.mjs --start"
+}

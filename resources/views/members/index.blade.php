@@ -16,9 +16,9 @@
     @endif
 
     <div class="mt-8 grid gap-4 sm:grid-cols-3">
-        <div class="rounded-2xl border border-brand-border bg-brand-accent/10 p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Total members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($totalMembers) }}</p></div>
-        <div class="rounded-2xl border border-brand-border bg-brand-accent/20 p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Active members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($activeMembers) }}</p></div>
-        <div class="rounded-2xl border border-brand-border bg-brand-accent/10 p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Inactive members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($inactiveMembers) }}</p></div>
+        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Total members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($totalMembers) }}</p></div>
+        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Active members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($activeMembers) }}</p></div>
+        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Inactive members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($inactiveMembers) }}</p></div>
     </div>
 
     <section class="mt-8 overflow-hidden rounded-2xl border border-brand-border bg-white" aria-labelledby="directory-heading">
@@ -27,7 +27,7 @@
                 <div><h2 id="directory-heading" class="text-lg font-bold text-slate-950">Member directory</h2><p class="mt-1 text-sm font-medium text-slate-600">Search and filter your member records.</p></div>
                 <span class="text-sm font-semibold text-slate-600">{{ $members->total() }} results</span>
             </div>
-            <form action="{{ route('members.index') }}" method="GET" class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_170px_170px_140px_auto]">
+            <form action="{{ route('members.index') }}" method="GET" class="mt-5 grid gap-3 sm:grid-cols-2 2xl:grid-cols-[minmax(220px,1fr)_170px_170px_140px_auto]">
                 <label class="sr-only" for="search">Search members</label>
                 <input id="search" name="search" type="search" value="{{ request('search') }}" placeholder="Search name, number, category or level" class="w-full rounded-lg border border-brand-border bg-white px-3 py-2.5 text-sm font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">
                 <label class="sr-only" for="membership_category_id">Category</label>

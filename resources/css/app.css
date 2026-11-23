@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,11 +7,181 @@
 @theme {
     --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --color-brand-sidebar: #291c24;
+    --color-brand-sidebar: #151518;
     --color-brand-primary: #623547;
     --color-brand-accent: #a9677d;
     --color-brand-canvas: #f9f4f5;
-    --color-brand-border: #ebdde3;
+    --color-brand-border: #e7e3e5;
+    --color-brand-outer: #f9f4f5;
+    --color-obsidian: #151518;
+    --color-charcoal: #252328;
+    --color-slate-950: #151518;
+    --color-slate-900: #252328;
+    --color-slate-800: #39353c;
+    --color-slate-700: #514b54;
+    --color-slate-600: #625b65;
+    --color-slate-500: #746b76;
+    --color-slate-400: #8d8390;
+    --color-slate-300: #d1cbd2;
+    --color-slate-200: #e7e3e7;
+    --color-slate-100: #f4f2f4;
+}
+
+@layer base {
+    .dark {
+        color-scheme: dark;
+        --color-brand-sidebar: #151518;
+        --color-brand-primary: #7e495d;
+        --color-brand-accent: #c895a8;
+        --color-brand-canvas: #151518;
+        --color-brand-outer: #252328;
+        --color-brand-border: #3a363e;
+    }
+}
+
+@layer components {
+    .cw-workspace { min-width: 0; }
+    .cw-header {
+        background: rgba(255, 255, 255, .9);
+        backdrop-filter: blur(16px);
+    }
+    .dark .cw-header { background: rgba(21, 21, 24, .9); }
+    .cw-sidebar nav a { min-height: 46px; }
+    .cw-sidebar nav a.text-white { background: #623547; }
+    .cw-workspace :where(h1) { font-size: clamp(1.875rem, 3vw, 2.5rem); letter-spacing: -.035em; }
+    .cw-workspace :where(table) { width: 100%; }
+    .cw-workspace :where(thead) { background: var(--color-slate-100); }
+    .dark .cw-workspace :where(thead) { background: #201e23; }
+    .cw-workspace :where(th) { font-size: .7rem; letter-spacing: .075em; }
+    .cw-workspace :where(td) { line-height: 1.6; }
+    .cw-workspace :where(input:not([type=checkbox]):not([type=hidden]), select, textarea) {
+        min-width: 0;
+        min-height: 44px;
+        caret-color: var(--color-brand-accent);
+    }
+    .cw-workspace input[type=checkbox], .cw-login input[type=checkbox] { accent-color: #623547; }
+    .cw-workspace :where(a, button):focus-visible, .cw-login :where(a, button):focus-visible {
+        outline: 2px solid var(--color-brand-accent);
+        outline-offset: 3px;
+    }
+    .cw-workspace :where(button, a[class*="rounded"]), .cw-login :where(button) {
+        transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms cubic-bezier(.23,1,.32,1);
+    }
+    .cw-workspace :where(button):active { transform: scale(.98); }
+    dialog { box-shadow: 0 28px 80px -24px rgba(0,0,0,.5); }
+    dialog::backdrop { background: rgba(21,21,24,.65); backdrop-filter: blur(4px); }
+    .cw-feature {
+        position: relative;
+        overflow: hidden;
+        color: white;
+        background: radial-gradient(ellipse at 100% 0%, rgba(169,103,125,.28), transparent 65%), #151518;
+        box-shadow: 0 18px 40px -24px rgba(21,21,24,.7);
+    }
+    .dark .cw-feature { background-color: #30252e; }
+    .cw-feature::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 50%;
+        right: -100px;
+        bottom: -110px;
+        pointer-events: none;
+    }
+    .cw-feature :is(h2, p, a) { color: inherit; }
+    .cw-feature .cw-feature-muted { color: #d4c6cc; }
+    .cw-kpi { padding: clamp(1.5rem, 3vw, 2rem); background: white; border: 1px solid var(--color-brand-border); border-radius: 1rem; }
+    .dark .cw-kpi { background: #252328; }
+    .dark ::selection { color: white; }
+    .cw-login-panel {
+        background: radial-gradient(ellipse at 0% 100%, rgba(98,53,71,.65), transparent 65%), #151518;
+        position: relative;
+        overflow: hidden;
+    }
+    .cw-login-panel::after {
+        content: '';
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 50%;
+        bottom: -210px;
+        right: -120px;
+        pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .cw-workspace :where(button, a), .cw-login :where(button) { transition: none; transform: none; }
+    }
+    @media (max-width: 767px) {
+        .cw-workspace :where(input:not([type=checkbox]), select, textarea) { font-size: 1rem; }
+    }
+    .cw-card {
+        box-shadow: 0 8px 20px -18px rgba(41, 28, 36, .35);
+    }
+
+    .cw-workspace :is(section, article, form).bg-white {
+        box-shadow: 0 8px 22px -20px rgba(41, 28, 36, .38);
+    }
+
+    .cw-theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        min-height: 2.5rem;
+        border: 1px solid var(--color-brand-border);
+        border-radius: .75rem;
+        padding: .5rem .75rem;
+        color: #623547;
+        background: #fff;
+        font-size: .8125rem;
+        font-weight: 700;
+        transition: background-color .15s ease, transform .15s cubic-bezier(.23,1,.32,1);
+    }
+    .cw-theme-toggle:hover { background: #f5eff1; }
+    .cw-theme-toggle:active { transform: scale(.98); }
+    .cw-theme-toggle:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
+    .dark .cw-theme-toggle { color: #f9f4f5; background: #252328; }
+    .dark .cw-theme-toggle:hover { background: #363139; }
+}
+
+@layer utilities {
+    .cw-workspace input::placeholder, .cw-workspace textarea::placeholder, .cw-login input::placeholder { color: #746b76; opacity: 1; }
+    .cw-transactions-table :is(th, td) { white-space: normal; overflow-wrap: anywhere; padding-left: 1rem; padding-right: 1rem; }
+    .cw-transactions-table :is(th, td):first-child { width: 19%; }
+    .cw-transactions-table :is(th, td):nth-child(2) { width: 20%; }
+    .cw-transactions-table :is(th, td):nth-child(6) { width: 15%; }
+    .dark .cw-app-pane.bg-white { background: #151518; }
+    .dark .bg-white { background-color: #252328; }
+    .dark .bg-brand-accent\/10 { background-color: #32282f; }
+    .dark .bg-brand-accent\/20 { background-color: #3c2b35; }
+    .dark .bg-brand-canvas\/40 { background-color: #362b34; }
+    .dark .bg-brand-canvas\/60 { background-color: #362b34; }
+    .dark .bg-brand-canvas\/70 { background-color: #362b34; }
+    .dark .bg-slate-100, .dark .bg-slate-200 { background-color: #40343e; }
+    .dark .text-slate-950, .dark .text-slate-900, .dark .text-slate-800 { color: #f5edf1; }
+    .dark .text-slate-700, .dark .text-slate-600 { color: #d8c6cf; }
+    .dark .text-slate-500, .dark .text-slate-400 { color: #baa6b2; }
+    .dark .text-brand-sidebar { color: #f5edf1; }
+    .dark .text-brand-primary { color: #e1aabb; }
+    .dark .bg-brand-primary { background-color: #7e495d; }
+    .dark .bg-brand-sidebar { background-color: #151518; }
+    .dark .bg-brand-canvas { background-color: #151518; }
+    .dark .bg-emerald-50 { background-color: #193c32; }
+    .dark .text-emerald-700, .dark .text-emerald-800 { color: #a8ebcc; }
+    .dark .bg-blue-50 { background-color: #243b54; }
+    .dark .text-blue-800 { color: #b8d8fa; }
+    .dark .bg-amber-50 { background-color: #4b3820; }
+    .dark .text-amber-800 { color: #f5d596; }
+    .dark .bg-red-50 { background-color: #4c282e; }
+    .dark .text-red-700, .dark .text-red-800 { color: #ffc1c7; }
+    .dark .text-white { color: #fff; }
+    .dark .border-slate-100, .dark .border-slate-200 { border-color: #55434f; }
+    .dark .divide-slate-100 > :not(:last-child), .dark .divide-slate-200 > :not(:last-child) { border-color: #55434f; }
+    .dark input, .dark select, .dark textarea { color: #f9f4f5; background-color: #1d1b20; border-color: #514851; }
+    .dark input::placeholder, .dark textarea::placeholder { color: #bdabb5; }
+    .dark dialog { color: #f9f4f5; background-color: #252328; }
 }
 
 @layer base {

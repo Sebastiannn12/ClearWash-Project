@@ -5,10 +5,14 @@
 @section('content')
     <a href="{{ route('transactions.show', $transaction) }}" class="text-sm font-semibold text-brand-primary hover:underline">Back to transaction</a>
     <div class="mt-6 max-w-xl">
-        <p class="mb-4 text-sm text-slate-600">{{ $transaction->reference_number }} · {{ $transaction->member->full_name }} · Remaining ₱{{ number_format($remainingBalance, 2) }}</p>
-                <section class="rounded-2xl border border-brand-border bg-brand-accent/10 p-5 sm:p-7">
-                    <h2 class="text-lg font-bold text-slate-950">Record payment</h2>
-                    <p class="mt-1 text-sm font-medium text-slate-600">Add a full or partial payment.</p>
+        <h1 class="mb-2 font-bold text-slate-950">Record payment</h1>
+        <p class="mb-6 text-sm text-slate-600">Add a full or partial payment to this transaction.</p>
+        <dl class="mb-6 grid gap-5 rounded-2xl bg-obsidian p-6 text-white sm:grid-cols-2">
+            <div><dt class="text-xs text-white/70">Member</dt><dd class="mt-1 font-semibold">{{ $transaction->member->full_name }}</dd><dd class="mt-2 break-all font-mono text-xs text-white/70">{{ $transaction->reference_number }}</dd></div>
+            <div><dt class="text-xs text-white/70">Remaining balance</dt><dd class="mt-2 break-words text-3xl font-bold tracking-tight tabular-nums">₱{{ number_format($remainingBalance, 2) }}</dd></div>
+        </dl>
+                <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+                    <h2 class="text-lg font-bold text-slate-950">Payment details</h2>
 
                     <form method="POST" action="{{ route('transactions.payments.store', $transaction) }}" class="mt-5 space-y-5">
                         @csrf

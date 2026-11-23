@@ -5,7 +5,7 @@
     </div>
 @else
     <div class="overflow-x-auto">
-        <table class="min-w-[680px] divide-y divide-slate-200 text-left text-sm">
+        <table class="w-full min-w-[680px] divide-y divide-slate-200 text-left text-sm">
             <thead class="bg-brand-canvas text-xs font-bold uppercase tracking-wide text-slate-600">
                 <tr>
                     <th class="px-5 py-3 sm:px-7">Reference</th>
