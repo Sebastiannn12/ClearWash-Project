@@ -9,11 +9,11 @@ class MembershipCategory extends Model
 {
     public const REQUIRED_NAMES = ['Student', 'Regular', 'Senior Citizen', 'Corporate'];
 
-    protected $fillable = ['name', 'benefits', 'is_active'];
+    protected $fillable = ['name', 'benefits', 'discount_percentage', 'is_active'];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['discount_percentage' => 'decimal:2', 'is_active' => 'boolean'];
     }
 
     public function members(): HasMany

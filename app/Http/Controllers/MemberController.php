@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
-use App\Models\Payment;
+use App\Models\MembershipTransaction;
 use App\TransactionStatus;
 use App\TransactionType;
 use Illuminate\Http\Request;
@@ -71,6 +71,8 @@ class MemberController extends Controller
 
         $member = DB::transaction(function () use ($validated) {
             $level = MembershipLevel::findOrFail($validated['membership_level_id']);
+            $category = MembershipCategory::findOrFail($validated['membership_category_id']);
+            $pricing = MembershipTransaction::pricingFor($category, $level);
 
             $member = Member::create($validated);
 
@@ -78,8 +80,10 @@ class MemberController extends Controller
                 ['type' => TransactionType::Application->value],
                 [
                     'membership_level_id' => $level->id,
-                    'status' => TransactionStatus::Pending->value,
-                    'amount_due' => $level->fee,
+                    'status' => (float) $pricing['amount_due'] === 0.0 ? TransactionStatus::Paid->value : TransactionStatus::Pending->value,
+                    ...$pricing,
+                    'category_name' => $category->name,
+                    'level_name' => $level->name,
                     'validity_days' => $level->validity_days,
                 ],
             );
@@ -112,7 +116,7 @@ class MemberController extends Controller
 
     public function print(Member $member)
     {
-        $member->load(['membershipCategory', 'membershipLevel']);
+        $member->load(['membershipCategory', 'membershipLevel', 'membershipTransactions' => fn ($query) => $query->with('payments')->latest()->limit(1)]);
 
         return view('members.print', compact('member'));
     }
@@ -132,7 +136,7 @@ class MemberController extends Controller
         return redirect()->route('members.show', $member)->with('success', 'Member information updated.');
     }
 
-    public function destroy(Member $member)
+    public function deactivate(Member $member)
     {
         $member->update(['is_active' => false]);
 
@@ -144,75 +148,6 @@ class MemberController extends Controller
         $member->update(['is_active' => true]);
 
         return redirect()->route('members.show', $member)->with('success', 'Member reactivated.');
-    }
-
-    public function forceDelete(Member $member)
-    {
-        $memberName = $member->full_name;
-        $result = DB::transaction(function () use ($member): array {
-            $lockedMember = Member::query()->lockForUpdate()->findOrFail($member->id);
-            $transactions = $lockedMember->membershipTransactions()
-                ->lockForUpdate()
-                ->get();
-            $transactionIds = $transactions->modelKeys();
-
-            $transactionIdsWithPayments = $transactionIds === []
-                ? collect()
-                : Payment::whereIn('membership_transaction_id', $transactionIds)
-                    ->pluck('membership_transaction_id')
-                    ->unique();
-
-            if ($transactionIdsWithPayments->isNotEmpty()) {
-                $references = $transactions
-                    ->whereIn('id', $transactionIdsWithPayments)
-                    ->pluck('reference_number')
-                    ->implode(', ');
-
-                return [
-                    'error' => "Permanent deletion blocked: transaction(s) {$references} contain recorded payments. Payment and financial history must be preserved.",
-                ];
-            }
-
-            $protectedStatuses = $transactions
-                ->whereNotIn('status', [
-                    TransactionStatus::Pending->value,
-                    TransactionStatus::Cancelled->value,
-                ])
-                ->pluck('status')
-                ->unique()
-                ->values();
-
-            if ($protectedStatuses->isNotEmpty()) {
-                $protectedTransactions = $transactions
-                    ->whereIn('status', $protectedStatuses)
-                    ->map(fn ($transaction) => "{$transaction->reference_number} ({$transaction->status})")
-                    ->implode(', ');
-
-                return [
-                    'error' => "Permanent deletion blocked: {$protectedTransactions}. Only payment-free Pending or Cancelled transactions may be deleted with a member.",
-                ];
-            }
-
-            $deletedTransactionCount = $transactions->count();
-            $lockedMember->membershipTransactions()->delete();
-            $lockedMember->forceDelete();
-
-            return ['deleted_transaction_count' => $deletedTransactionCount];
-        });
-
-        if (isset($result['error'])) {
-            return redirect()->route('members.index')
-                ->with('error', $result['error']);
-        }
-
-        $transactionMessage = $result['deleted_transaction_count'] === 1
-            ? ' One payment-free Pending or Cancelled transaction was also deleted.'
-            : ($result['deleted_transaction_count'] > 1
-                ? " {$result['deleted_transaction_count']} payment-free Pending or Cancelled transactions were also deleted."
-                : '');
-
-        return redirect()->route('members.index')
-            ->with('success', "{$memberName} was permanently deleted.{$transactionMessage}");
     }
 
     private function validatedData(Request $request, ?Member $member = null): array
@@ -287,8 +222,8 @@ class MemberController extends Controller
     private function membershipOptions(): array
     {
         return [
-            'categories' => MembershipCategory::where('is_active', true)->orderBy('id')->get(['id', 'name']),
-            'levels' => MembershipLevel::where('is_active', true)->orderBy('id')->get(['id', 'name']),
+            'categories' => MembershipCategory::where('is_active', true)->orderBy('id')->get(['id', 'name', 'discount_percentage']),
+            'levels' => MembershipLevel::where('is_active', true)->orderBy('id')->get(['id', 'name', 'fee']),
         ];
     }
 }

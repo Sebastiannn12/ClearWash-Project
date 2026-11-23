@@ -5,13 +5,14 @@
     </div>
 @else
     <div class="overflow-x-auto">
-        <table class="w-full min-w-[680px] divide-y divide-slate-200 text-left text-sm">
+        <table class="w-full min-w-[760px] divide-y divide-slate-200 text-left text-sm">
             <thead class="bg-brand-canvas text-xs font-bold uppercase tracking-wide text-slate-600">
                 <tr>
                     <th class="px-5 py-3 sm:px-7">Reference</th>
                     <th class="px-5 py-3">Method</th>
                     <th class="px-5 py-3">Paid at</th>
                     <th class="px-5 py-3 text-right sm:pr-7">Amount</th>
+                    <th class="px-5 py-3 text-right sm:pr-7">Receipt</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-800">
@@ -21,6 +22,7 @@
                         <td class="whitespace-nowrap px-5 py-4 font-semibold">{{ $payment->method }}</td>
                         <td class="whitespace-nowrap px-5 py-4 font-medium">{{ $payment->paid_at->format('M j, Y g:i A') }}</td>
                         <td class="whitespace-nowrap px-5 py-4 text-right font-bold sm:pr-7">₱{{ number_format((float) $payment->amount, 2) }}</td>
+                        <td class="whitespace-nowrap px-5 py-4 text-right sm:pr-7"><a href="{{ route('payments.receipt', $payment) }}" target="_blank" rel="noopener" class="font-semibold text-brand-primary hover:underline">Print</a></td>
                     </tr>
                 @endforeach
             </tbody>

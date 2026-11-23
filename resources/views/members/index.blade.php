@@ -61,14 +61,19 @@
                         <div class="mt-5 flex flex-wrap gap-2 border-t border-brand-border pt-4">
                             <a href="{{ route('members.show', $member) }}" class="rounded-lg border border-brand-border bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200">View</a>
                             <a href="{{ route('members.edit', $member) }}" class="rounded-lg border border-brand-border bg-brand-accent/10 px-3 py-2 text-xs font-semibold text-brand-primary transition-colors hover:bg-brand-accent/15">Edit</a>
-                            @unless ($member->is_active)
+                            @if ($member->is_active)
+                                <form method="POST" action="{{ route('members.deactivate', $member) }}" onsubmit="return confirm('Deactivate this member? Their records and transaction history will remain available.')">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100">Deactivate</button>
+                                </form>
+                            @else
                                 <form method="POST" action="{{ route('members.reactivate', $member) }}">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">Reactivate</button>
                                 </form>
-                            @endunless
-                            <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100">Delete</button>
+                            @endif
                         </div>
                     </article>
                 @endforeach
@@ -88,14 +93,19 @@
                                     <div class="flex flex-wrap items-center justify-end gap-2">
                                         <a href="{{ route('members.show', $member) }}" class="rounded-lg border border-brand-border bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200">View</a>
                                         <a href="{{ route('members.edit', $member) }}" class="rounded-lg border border-brand-border bg-brand-accent/10 px-3 py-2 text-xs font-semibold text-brand-primary transition-colors hover:bg-brand-accent/15">Edit</a>
-                                        @unless ($member->is_active)
+                                        @if ($member->is_active)
+                                            <form method="POST" action="{{ route('members.deactivate', $member) }}" onsubmit="return confirm('Deactivate this member? Their records and transaction history will remain available.')">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100">Deactivate</button>
+                                            </form>
+                                        @else
                                             <form method="POST" action="{{ route('members.reactivate', $member) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">Reactivate</button>
                                             </form>
-                                        @endunless
-                                        <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100">Delete</button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -106,8 +116,4 @@
             <div class="border-t border-brand-border px-5 py-4">{{ $members->links() }}</div>
         @endif
     </section>
-    @foreach ($members as $member)
-        @include('members._delete-modal', ['member' => $member])
-    @endforeach
-
 @endsection

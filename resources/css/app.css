@@ -11,7 +11,7 @@
     --color-brand-primary: #623547;
     --color-brand-accent: #a9677d;
     --color-brand-canvas: #f9f4f5;
-    --color-brand-border: #e7e3e5;
+    --color-brand-border: #d8cbd1;
     --color-brand-outer: #f9f4f5;
     --color-obsidian: #151518;
     --color-charcoal: #252328;
@@ -35,11 +35,13 @@
         --color-brand-accent: #c895a8;
         --color-brand-canvas: #151518;
         --color-brand-outer: #252328;
-        --color-brand-border: #3a363e;
+        --color-brand-border: #554a53;
     }
 }
 
 @layer components {
+    .cw-logo { display: inline-flex; flex: none; overflow: hidden; align-items: center; justify-content: center; background: #fff; }
+    .cw-logo img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.45); }
     .cw-workspace { min-width: 0; }
     .cw-header {
         background: rgba(255, 255, 255, .9);
@@ -120,6 +122,62 @@
         box-shadow: 0 8px 20px -18px rgba(41, 28, 36, .35);
     }
 
+    .cw-ledger {
+        overflow: hidden;
+        border: 1.5px solid var(--color-brand-border);
+        border-radius: 1rem;
+        background: #fff;
+    }
+
+    .cw-ledger-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        min-height: 7.75rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--color-brand-border);
+        transition: background-color 150ms ease;
+    }
+
+    .cw-ledger-row:last-child { border-bottom: 0; }
+    .cw-ledger-row:hover { background: #fcf9fa; }
+
+    .cw-ledger-icon {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: .75rem;
+        color: #623547;
+        background: #f9f4f5;
+    }
+
+    .cw-ledger-icon svg { width: 1.25rem; height: 1.25rem; }
+
+    .cw-required-label { display: inline-flex; align-items: center; gap: .45rem; }
+    .cw-required-dot {
+        width: .45rem;
+        height: .45rem;
+        flex: none;
+        border-radius: 9999px;
+        background: #623547;
+        box-shadow: 0 0 0 2px #f1e5ea;
+    }
+
+    .dark .cw-required-dot { background: #d9a1b5; box-shadow: 0 0 0 2px #4a3540; }
+
+    .dark .cw-ledger { background: #252328; }
+    .dark .cw-ledger-row:hover { background: #2d2a30; }
+    .dark .cw-ledger-icon { color: #e1aabb; background: #3a3037; }
+
+    @media (max-width: 639px) {
+        .cw-ledger-row { align-items: flex-start; min-height: auto; padding: 1.125rem; }
+        .cw-ledger-icon { width: 2.25rem; height: 2.25rem; }
+    }
+
     .cw-workspace :is(section, article, form).bg-white {
         box-shadow: 0 8px 22px -20px rgba(41, 28, 36, .38);
     }
@@ -147,6 +205,8 @@
 }
 
 @layer utilities {
+    .cw-workspace :is(section, article, form).border-brand-border { border-width: 1.5px; }
+    .cw-workspace :is(section, article).border-brand-border\/70 { border-width: 1.5px; }
     .cw-workspace input::placeholder, .cw-workspace textarea::placeholder, .cw-login input::placeholder { color: #746b76; opacity: 1; }
     .cw-transactions-table :is(th, td) { white-space: normal; overflow-wrap: anywhere; padding-left: 1rem; padding-right: 1rem; }
     .cw-transactions-table :is(th, td):first-child { width: 19%; }
@@ -181,6 +241,15 @@
     .dark .divide-slate-100 > :not(:last-child), .dark .divide-slate-200 > :not(:last-child) { border-color: #55434f; }
     .dark input, .dark select, .dark textarea { color: #f9f4f5; background-color: #1d1b20; border-color: #514851; }
     .dark input::placeholder, .dark textarea::placeholder { color: #bdabb5; }
+    .dark :is(.cw-workspace, .cw-login) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea) {
+        color: #151518;
+        background-color: #fff;
+        border-color: #bdaeb5;
+        color-scheme: light;
+    }
+    .dark :is(.cw-workspace, .cw-login) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), textarea)::placeholder {
+        color: #746b76;
+    }
     .dark dialog { color: #f9f4f5; background-color: #252328; }
 }
 

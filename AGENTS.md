@@ -1,3 +1,5 @@
+Before building or changing UI, read `DESIGN.md`.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

@@ -11,7 +11,7 @@
     <main class="min-h-screen lg:grid lg:grid-cols-[minmax(340px,0.8fr)_minmax(520px,1.2fr)]">
         <section class="cw-login-panel hidden p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-14" aria-label="ClearWash">
             <div class="flex items-center gap-3">
-                <span class="flex size-11 items-center justify-center rounded-xl bg-brand-accent text-xl font-bold">C</span>
+                <span class="cw-logo size-11 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                 <span class="text-xl font-semibold tracking-tight">ClearWash</span>
             </div>
             <div class="max-w-md">
@@ -25,7 +25,7 @@
             <div class="w-full max-w-md">
                 <div class="mb-4 flex justify-end"><button type="button" class="cw-theme-toggle" data-theme-toggle aria-pressed="false"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5Z"/></svg><span data-theme-label>Dark mode</span></button></div>
                 <div class="mb-8 flex items-center gap-3 lg:hidden">
-                    <span class="flex size-10 items-center justify-center rounded-xl bg-brand-sidebar text-lg font-bold text-white">C</span>
+                    <span class="cw-logo size-10 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                     <span class="text-xl font-bold tracking-tight text-slate-950">ClearWash</span>
                 </div>
 

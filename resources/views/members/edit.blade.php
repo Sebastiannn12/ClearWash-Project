@@ -8,13 +8,16 @@
     </div>
     <form method="POST" action="{{ route('members.update', $member) }}" class="mt-8 max-w-4xl rounded-2xl border border-brand-border bg-white p-5 [&_input]:font-medium [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
         @csrf @method('PUT')
-        <div class="mb-7 border-b border-brand-border/70 pb-5"><h2 class="text-lg font-bold text-slate-950">Member details</h2><p class="mt-1 text-sm font-medium text-slate-600">Fields marked * are required.</p></div>
+        <div class="mb-7 border-b border-brand-border/70 pb-5"><h2 class="text-lg font-bold text-slate-950">Member details</h2><p class="mt-1 text-sm font-medium text-slate-600">Fields marked with a dot are required.</p></div>
         @include('members._form')
         <div class="mt-8 flex flex-col-reverse gap-3 border-t border-brand-border/70 pt-6 sm:flex-row sm:flex-wrap">
-            <button type="button" onclick="document.getElementById('permanent-delete-{{ $member->id }}').showModal()" class="rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-700 transition-[background-color,transform] duration-150 hover:bg-red-100 active:scale-[0.98]">Delete member</button>
+            <button type="submit" form="member-status-form" onclick="return confirm('Are you sure you want to {{ $member->is_active ? 'deactivate' : 'reactivate' }} this member?')" class="rounded-xl border px-5 py-2.5 text-sm font-bold transition-[background-color,transform] duration-150 active:scale-[0.98] {{ $member->is_active ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">{{ $member->is_active ? 'Deactivate member' : 'Reactivate member' }}</button>
             <a href="{{ route('members.show', $member) }}" class="rounded-xl border border-brand-border bg-white px-5 py-2.5 text-center text-sm font-semibold text-slate-800 transition-[background-color,transform] duration-150 hover:bg-brand-canvas active:scale-[0.98]">Cancel</a>
             <button class="rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent active:scale-[0.98]">Save changes</button>
         </div>
     </form>
-    @include('members._delete-modal', ['member' => $member])
+    <form id="member-status-form" method="POST" action="{{ $member->is_active ? route('members.deactivate', $member) : route('members.reactivate', $member) }}">
+        @csrf
+        @method('PATCH')
+    </form>
 @endsection

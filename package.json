@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
+        "check:design": "node scripts/check-design-rules.mjs",
         "dev": "vite"
     },
     "devDependencies": {

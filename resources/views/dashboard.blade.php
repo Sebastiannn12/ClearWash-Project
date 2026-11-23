@@ -5,8 +5,8 @@
 @section('content')
     <div class="flex flex-wrap items-end justify-between gap-5">
         <div>
-            <h1 class="font-bold text-slate-950">Dashboard</h1>
-            <p class="mt-2 text-sm leading-6 text-slate-600">Members, transactions, and payments. Your workspace at a glance.</p>
+            <h1 class="font-bold text-slate-950">Welcome back, {{ \Illuminate\Support\Str::before(auth()->user()->name, ' ') }}!</h1>
+            <p class="mt-2 text-sm leading-6 text-slate-600">Here's what's happening with ClearWash today.</p>
         </div>
         <a href="{{ route('transactions.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white hover:bg-brand-sidebar">
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>Create transaction

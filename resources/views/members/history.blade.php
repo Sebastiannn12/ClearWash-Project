@@ -24,13 +24,13 @@
                 <div class="flex flex-wrap items-start justify-between gap-4 px-5 py-5 sm:px-7">
                     <div>
                         <a href="{{ route('transactions.show', $transaction) }}" class="font-mono text-sm font-bold text-brand-primary hover:underline">{{ $transaction->reference_number }}</a>
-                        <p class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->type }} · {{ $transaction->membershipLevel->name }}</p>
+                        <p class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->type }} · {{ $transaction->category_name ?? $member->membershipCategory?->name ?? $member->category }} · {{ $transaction->level_name ?? $transaction->membershipLevel->name }}</p>
                     </div>
                     <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span>
                 </div>
 
                 <dl class="grid gap-4 border-y border-brand-border/70 bg-brand-canvas/60 px-5 py-4 sm:grid-cols-2 sm:px-7 lg:grid-cols-4">
-                    <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Amount</dt><dd class="mt-1 text-sm font-bold text-slate-900">₱{{ number_format((float) $transaction->amount_due, 2) }}</dd></div>
+                    <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Fee and discount</dt><dd class="mt-1 text-sm font-bold text-slate-900">₱{{ number_format((float) ($transaction->original_fee ?? $transaction->amount_due), 2) }} − {{ number_format((float) $transaction->discount_percentage, 2) }}% = ₱{{ number_format((float) $transaction->amount_due, 2) }}</dd></div>
                     <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Created</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->created_at->format('M j, Y g:i A') }}</dd></div>
                     <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Approved</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->approved_at?->format('M j, Y g:i A') ?: '—' }}</dd></div>
                     <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Subscription ends</dt><dd class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->expires_at?->format('M j, Y g:i A') ?: '—' }}</dd></div>

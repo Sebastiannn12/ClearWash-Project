@@ -145,11 +145,15 @@ class MembershipSettingController extends Controller
 
     private function categoryValidator(Request $request, ?MembershipCategory $category = null)
     {
-        $request->merge(['name' => trim((string) $request->input('name'))]);
+        $request->merge([
+            'name' => trim((string) $request->input('name')),
+            'discount_percentage' => $request->input('discount_percentage', $category?->discount_percentage ?? 0),
+        ]);
 
         return Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255', Rule::unique('membership_categories', 'name')->ignore($category)],
             'benefits' => ['nullable', 'string', 'max:2000'],
+            'discount_percentage' => ['required', 'numeric', 'between:0,100', 'decimal:0,2'],
             'is_active' => ['required', 'boolean'],
         ]);
     }

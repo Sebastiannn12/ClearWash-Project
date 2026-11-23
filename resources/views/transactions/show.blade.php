@@ -52,8 +52,12 @@
                         <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $transaction->member->full_name }}</dd>
                     </div>
                     <div>
+                        <dt class="text-xs font-bold uppercase tracking-wide text-slate-600">Category</dt>
+                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $transaction->category_name ?? $transaction->member->membershipCategory?->name ?? $transaction->member->category }}</dd>
+                    </div>
+                    <div>
                         <dt class="text-xs font-bold uppercase tracking-wide text-slate-600">Membership level</dt>
-                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $transaction->membershipLevel->name }}</dd>
+                        <dd class="mt-1 text-sm font-semibold text-slate-900">{{ $transaction->level_name ?? $transaction->membershipLevel->name }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-bold uppercase tracking-wide text-slate-600">Transaction type</dt>
@@ -81,14 +85,14 @@
                     @endif
                 </dl>
 
-                <div class="mt-7 border-t border-brand-border/70 pt-6">
+                <div class="mt-7 border-t border-brand-border pt-6">
                     <h3 class="text-sm font-bold text-slate-950">Notes</h3>
                     <p class="mt-2 whitespace-pre-line text-sm font-medium leading-6 text-slate-700">{{ $transaction->notes ?: 'No notes added.' }}</p>
                 </div>
             </section>
 
             <section class="overflow-hidden rounded-2xl border border-brand-border bg-white">
-                <div class="border-b border-brand-border/70 px-5 py-5 sm:px-7">
+                <div class="border-b border-brand-border px-5 py-5 sm:px-7">
                     <h2 class="text-lg font-bold text-slate-950">Payment history</h2>
                     <p class="mt-1 text-sm font-medium text-slate-600">Payments recorded for this transaction.</p>
                 </div>
@@ -101,14 +105,16 @@
             <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Payment summary</h2>
                 <dl class="mt-5 space-y-5">
+                    <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Original fee</dt><dd class="text-sm font-bold text-slate-950">₱{{ number_format((float) ($transaction->original_fee ?? $transaction->amount_due), 2) }}</dd></div>
+                    <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Discount ({{ number_format((float) $transaction->discount_percentage, 2) }}%)</dt><dd class="text-sm font-bold text-slate-950">−₱{{ number_format((float) $transaction->discount_amount, 2) }}</dd></div>
                     <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Amount due</dt><dd class="text-sm font-bold text-slate-950">₱{{ number_format((float) $transaction->amount_due, 2) }}</dd></div>
                     <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Total paid</dt><dd class="text-sm font-bold text-emerald-700">₱{{ number_format($totalPaid, 2) }}</dd></div>
-                    <div class="flex items-center justify-between gap-4 border-t border-brand-border/70 pt-5"><dt class="text-sm font-bold text-slate-800">Remaining</dt><dd class="text-base font-bold text-slate-950">₱{{ number_format($remainingBalance, 2) }}</dd></div>
+                    <div class="flex items-center justify-between gap-4 border-t border-brand-border pt-5"><dt class="text-sm font-bold text-slate-800">Remaining</dt><dd class="text-base font-bold text-slate-950">₱{{ number_format($remainingBalance, 2) }}</dd></div>
                 </dl>
             </section>
 
-            @if ($transaction->status === \App\TransactionStatus::Pending->value && $remainingBalance > 0)
-                <a href="{{ route('payments.create', $transaction) }}" class="inline-flex rounded-xl bg-brand-primary px-4 py-3 text-sm font-bold text-white hover:bg-brand-sidebar">Record payment</a>
+            @if ($transaction->status === \App\TransactionStatus::Pending->value && $remainingBalance > 0 && $transaction->created_at->copy()->addDays(7)->gt(now()))
+                @include('transactions._record-payment')
             @endif
 
             <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">

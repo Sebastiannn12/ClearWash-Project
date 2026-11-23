@@ -12,7 +12,7 @@
     <div class="min-h-screen lg:flex">
         <aside class="cw-sidebar hidden h-screen w-64 shrink-0 flex-col bg-brand-sidebar px-5 py-7 text-slate-300 lg:sticky lg:top-0 lg:flex">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-2 text-white">
-                <span class="flex size-10 items-center justify-center rounded-xl bg-brand-primary text-lg font-bold">C</span>
+                <span class="cw-logo size-10 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                 <span class="text-lg font-semibold tracking-tight">ClearWash</span>
             </a>
             <p class="mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Workspace</p>
@@ -33,14 +33,18 @@
                 <a href="{{ route('membership-settings.categories.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('membership-settings.categories.*') ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Categories</a>
                 <a href="{{ route('membership-settings.levels.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold {{ request()->routeIs('membership-settings.levels.*') ? 'bg-brand-primary text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 10 5-10 5L2 8l10-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>Levels</a>
             </nav>
-            <div class="mt-auto border-t border-white/10 px-3 pt-5 text-xs leading-5 text-slate-500">Member management<br>Car wash subscription system</div>
+            @php($adminNameParts = preg_split('/\s+/', trim(auth()->user()->name)))
+            <div class="mt-auto flex min-w-0 items-center gap-3 border-t border-white/20 px-2 pt-5">
+                <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-primary text-sm font-bold text-white" aria-hidden="true">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($adminNameParts[0] ?? '', 0, 1).(count($adminNameParts) > 1 ? \Illuminate\Support\Str::substr(end($adminNameParts), 0, 1) : '')) }}</span>
+                <div class="min-w-0"><p class="truncate text-sm font-semibold text-white">{{ auth()->user()->name }}</p><p class="truncate text-xs text-slate-300">{{ auth()->user()->email }}</p></div>
+            </div>
         </aside>
 
         <div class="cw-app-pane min-w-0 flex-1 bg-white">
             <header class="cw-header border-b border-brand-border">
                 <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
                     <div class="flex items-center gap-3">
-                        <span class="flex size-9 items-center justify-center rounded-lg bg-brand-sidebar font-bold text-white lg:hidden">C</span>
+                        <span class="cw-logo size-9 rounded-lg lg:hidden"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                         <span class="hidden text-sm font-medium text-slate-500 sm:inline"><span>Workspace <span class="mx-2 text-slate-300">/</span></span><span class="font-semibold text-slate-800">{{ request()->routeIs('dashboard') ? 'Dashboard' : (request()->routeIs('membership-settings.categories.*') ? 'Categories' : (request()->routeIs('membership-settings.levels.*') ? 'Levels' : (request()->routeIs('payments.*') ? 'Payments' : (request()->routeIs('transactions.*') ? 'Transactions' : 'Members')))) }}</span></span>
                     </div>
                     <div class="flex items-center gap-3">

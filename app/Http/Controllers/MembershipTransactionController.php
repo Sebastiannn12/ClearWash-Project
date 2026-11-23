@@ -34,7 +34,7 @@ class MembershipTransactionController extends Controller
      */
     public function create()
     {
-        $members = Member::with('membershipLevel')->orderBy('first_name')->get();
+        $members = Member::with(['membershipLevel', 'membershipCategory'])->orderBy('first_name')->get();
 
         $levels = MembershipLevel::where('is_active', true)->get();
 
@@ -51,6 +51,12 @@ class MembershipTransactionController extends Controller
         $level = MembershipLevel::findOrFail(
             $validated['membership_level_id']
         );
+        $member = Member::with('membershipCategory')->findOrFail($validated['member_id']);
+        $category = $member->membershipCategory;
+
+        if (! $category) {
+            throw ValidationException::withMessages(['member_id' => 'This member has no membership category.']);
+        }
 
         if (! $level->is_active) {
             throw ValidationException::withMessages([
@@ -58,7 +64,7 @@ class MembershipTransactionController extends Controller
             ]);
         }
 
-        $transaction = DB::transaction(function () use ($validated, $level) {
+        $transaction = DB::transaction(function () use ($validated, $level, $category) {
             if (
                 $validated['type'] === TransactionType::Application->value
                 && MembershipTransaction::where('member_id', $validated['member_id'])
@@ -70,12 +76,16 @@ class MembershipTransactionController extends Controller
                 ]);
             }
 
+            $pricing = MembershipTransaction::pricingFor($category, $level);
+
             return MembershipTransaction::create([
                 'member_id' => $validated['member_id'],
                 'membership_level_id' => $level->id,
                 'type' => $validated['type'],
-                'status' => TransactionStatus::Pending->value,
-                'amount_due' => $level->fee,
+                'status' => (float) $pricing['amount_due'] === 0.0 ? TransactionStatus::Paid->value : TransactionStatus::Pending->value,
+                ...$pricing,
+                'category_name' => $category->name,
+                'level_name' => $level->name,
                 'validity_days' => $level->validity_days,
                 'notes' => $validated['notes'] ?? null,
             ]);
@@ -93,6 +103,7 @@ class MembershipTransactionController extends Controller
     {
         $transaction->load([
             'member',
+            'member.membershipCategory',
             'membershipLevel',
             'payments',
         ]);

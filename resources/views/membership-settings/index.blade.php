@@ -5,7 +5,7 @@
 @section('content')
     <div>
         <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">{{ $page === 'categories' ? 'Membership Categories' : 'Membership Levels' }}</h1>
-        <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-600 sm:text-base">{{ $page === 'categories' ? 'Manage member categories and benefits.' : 'Manage pricing, validity periods, and membership benefits.' }}</p>
+        <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-600 sm:text-base">{{ $page === 'categories' ? 'Manage member categories, benefits, and discounts.' : 'Manage pricing, validity periods, and membership benefits.' }}</p>
     </div>
 
     @if (session('error'))
@@ -38,6 +38,11 @@
                     <label for="new-category-benefits" class="text-sm font-bold text-slate-800">Benefits</label>
                     <textarea id="new-category-benefits" name="benefits" rows="2" maxlength="2000" class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">{{ $categoryCreateBag->any() ? old('benefits') : '' }}</textarea>
                     @error('benefits', 'category-create')<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="new-category-discount" class="text-sm font-bold text-slate-800">Discount percentage</label>
+                    <input id="new-category-discount" name="discount_percentage" type="number" min="0" max="100" step="0.01" value="{{ $categoryCreateBag->any() ? old('discount_percentage') : '0' }}" required class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-semibold outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">
+                    @error('discount_percentage', 'category-create')<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                 </div>
                 <div class="flex flex-col gap-3">
                     <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
@@ -79,6 +84,11 @@
                             <label for="category-benefits-{{ $category->id }}" class="text-sm font-bold text-slate-800">Benefits</label>
                             <textarea id="category-benefits-{{ $category->id }}" name="benefits" rows="3" maxlength="2000" class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">{{ $categoryBag->any() ? old('benefits') : $category->benefits }}</textarea>
                             @error('benefits', 'category-'.$category->id)<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label for="category-discount-{{ $category->id }}" class="text-sm font-bold text-slate-800">Discount percentage</label>
+                            <input id="category-discount-{{ $category->id }}" name="discount_percentage" type="number" min="0" max="100" step="0.01" value="{{ $categoryBag->any() ? old('discount_percentage') : $category->discount_percentage }}" required class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-semibold outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">
+                            @error('discount_percentage', 'category-'.$category->id)<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                         </div>
                         @unless ($category->isRequired())
                             <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">

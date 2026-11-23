@@ -53,10 +53,10 @@
             <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Account status</h2>
                 <p class="mt-2 text-sm font-medium leading-6 text-slate-600">{{ $member->is_active ? 'Deactivating keeps this member’s records available.' : 'Reactivate this member to mark their account active again.' }}</p>
-                <form method="POST" action="{{ $member->is_active ? route('members.destroy', $member) : route('members.reactivate', $member) }}" class="mt-5">
+                <form method="POST" action="{{ $member->is_active ? route('members.deactivate', $member) : route('members.reactivate', $member) }}" class="mt-5">
                     @csrf
-                    @method($member->is_active ? 'DELETE' : 'PATCH')
-                    <button type="submit" onclick="return confirm('Are you sure you want to {{ $member->is_active ? 'deactivate' : 'reactivate' }} this member?')" class="rounded-lg border px-4 py-2.5 text-sm font-bold {{ $member->is_active ? 'border-red-200 text-red-700 hover:bg-red-50' : 'border-brand-border text-brand-primary hover:bg-brand-accent/10' }}">{{ $member->is_active ? 'Deactivate member' : 'Reactivate member' }}</button>
+                    @method('PATCH')
+                    <button type="submit" onclick="return confirm('Are you sure you want to {{ $member->is_active ? 'deactivate' : 'reactivate' }} this member?')" class="rounded-lg border px-4 py-2.5 text-sm font-bold {{ $member->is_active ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">{{ $member->is_active ? 'Deactivate member' : 'Reactivate member' }}</button>
                 </form>
             </section>
         </div>

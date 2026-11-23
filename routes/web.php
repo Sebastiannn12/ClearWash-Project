@@ -18,15 +18,13 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/', DashboardController::class)->name('dashboard');
 
+    Route::patch('/members/{member}/deactivate', [MemberController::class, 'deactivate'])
+        ->name('members.deactivate');
     Route::patch('/members/{member}/reactivate', [MemberController::class, 'reactivate'])
         ->name('members.reactivate');
-    Route::delete('/members/{member}/permanent', [MemberController::class, 'forceDelete'])
-        ->name('members.force-delete');
     Route::get('/members/{member}/history', [MemberController::class, 'history'])->name('members.history');
     Route::get('/members/{member}/print', [MemberController::class, 'print'])->name('members.print');
     Route::resource('members', MemberController::class)->except(['destroy']);
-    Route::delete('/members/{member}', [MemberController::class, 'destroy'])
-        ->name('members.destroy');
 
     Route::get('/membership-setup', [MembershipSettingController::class, 'index'])
         ->name('membership-settings.index');
@@ -51,6 +49,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/transactions/{transaction}/payments', [PaymentController::class, 'store'])
         ->name('transactions.payments.store');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
     Route::get('/transactions/{transaction}/payment', [PaymentController::class, 'create'])->name('payments.create');
 
     Route::patch('/transactions/{transaction}/approve', [MembershipTransactionController::class, 'approve'])

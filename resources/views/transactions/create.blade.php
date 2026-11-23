@@ -10,23 +10,23 @@
         <p class="mt-3 text-sm font-medium leading-6 text-slate-600 sm:text-base">Start a membership application or renewal for an existing member.</p>
     </div>
 
-    <form method="POST" action="{{ route('transactions.store') }}" class="mt-8 max-w-4xl rounded-2xl border border-brand-border bg-white p-5 [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
+    <form method="POST" action="{{ route('transactions.store') }}" data-price-preview class="mt-8 max-w-4xl rounded-2xl border border-brand-border bg-white p-5 [&_label]:font-bold [&_select]:font-semibold [&_textarea]:font-medium sm:p-8">
         @csrf
 
         <div class="mb-7 border-b border-brand-border/70 pb-5">
             <h2 class="text-lg font-bold text-slate-950">Transaction details</h2>
-            <p class="mt-1 text-sm font-medium text-slate-600">Fields marked * are required.</p>
+            <p class="mt-1 text-sm font-medium text-slate-600">Fields marked with a dot are required.</p>
         </div>
 
         @php($fieldClass = 'mt-2 w-full rounded-xl border border-brand-border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 focus:border-brand-primary focus:ring-3 focus:ring-brand-border')
 
         <div class="grid gap-6 sm:grid-cols-2">
             <div class="sm:col-span-2">
-                <label for="member_id" class="text-sm font-medium text-slate-700">Member <span class="text-red-600">*</span></label>
-                <select id="member_id" name="member_id" required class="{{ $fieldClass }}">
+                <label for="member_id" class="cw-required-label text-sm font-medium text-slate-700"><span class="cw-required-dot" aria-hidden="true"></span>Member</label>
+                <select id="member_id" name="member_id" data-price-member required class="{{ $fieldClass }}">
                     <option value="">Select member</option>
                     @foreach ($members as $member)
-                        <option value="{{ $member->id }}" data-membership-level-id="{{ $member->membership_level_id }}" @selected((string) old('member_id') === (string) $member->id)>
+                        <option value="{{ $member->id }}" data-membership-level-id="{{ $member->membership_level_id }}" data-discount="{{ $member->membershipCategory?->discount_percentage ?? 0 }}" @selected((string) old('member_id') === (string) $member->id)>
                             {{ $member->full_name }}{{ $member->membership_number ? ' · '.$member->membership_number : '' }}
                         </option>
                     @endforeach
@@ -38,8 +38,8 @@
             </div>
 
             <div>
-                <label for="membership_level_id" class="text-sm font-medium text-slate-700">Membership level <span class="text-red-600">*</span></label>
-                <select id="membership_level_id" name="membership_level_id" required class="{{ $fieldClass }}">
+                <label for="membership_level_id" class="cw-required-label text-sm font-medium text-slate-700"><span class="cw-required-dot" aria-hidden="true"></span>Membership level</label>
+                <select id="membership_level_id" name="membership_level_id" data-price-level required class="{{ $fieldClass }}">
                     <option value="">Select level</option>
                     @foreach ($levels as $level)
                         <option value="{{ $level->id }}" data-level-name="{{ $level->name }}" data-fee="{{ $level->fee }}" data-validity-days="{{ $level->validity_days }}" @selected((string) old('membership_level_id') === (string) $level->id)>
@@ -57,7 +57,7 @@
             </div>
 
             <div>
-                <label for="type" class="text-sm font-medium text-slate-700">Transaction type <span class="text-red-600">*</span></label>
+                <label for="type" class="cw-required-label text-sm font-medium text-slate-700"><span class="cw-required-dot" aria-hidden="true"></span>Transaction type</label>
                 <select id="type" name="type" required class="{{ $fieldClass }}">
                     <option value="">Select type</option>
                     <option value="Application" @selected(old('type') === 'Application')>Application</option>
@@ -76,6 +76,8 @@
                 @enderror
             </div>
         </div>
+
+        <div class="mt-6">@include('members._pricing-preview')</div>
 
         <div class="mt-8 flex flex-col-reverse gap-3 border-t border-brand-border/70 pt-6 sm:flex-row">
             <a href="{{ route('transactions.index') }}" class="rounded-xl border border-brand-border px-5 py-2.5 text-center text-sm font-semibold text-slate-800 transition-[background-color,transform] duration-150 hover:bg-brand-canvas active:scale-[0.98]">Cancel</a>
