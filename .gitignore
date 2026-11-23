@@ -21,6 +21,9 @@
 /storage/*.key
 /storage/pail
 /vendor
+/.agents/
+/.claude/
+/.kiro/
 _ide_helper.php
 Homestead.json
 Homestead.yaml
