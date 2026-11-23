@@ -112,11 +112,11 @@
 
     @else
     @php($levelCreateBag = $errors->getBag('level-create'))
-    <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7" aria-labelledby="levels-heading">
+    <section class="mt-10 rounded-2xl border border-brand-border bg-white p-5 sm:p-7" aria-labelledby="levels-heading">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <h2 id="levels-heading" class="text-2xl font-bold text-slate-950">Membership levels</h2>
-                <p class="mt-1 text-sm font-medium text-slate-600">Active levels require a fee and validity period because these values are used by TPS transactions.</p>
+                <p class="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-700">Active levels require a fee and validity period because these values are used by TPS transactions.</p>
             </div>
             <button type="button" onclick="document.getElementById('add-level-modal').showModal()" class="shrink-0 rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Add level</button>
         </div>
@@ -159,7 +159,7 @@
         </form>
         </dialog>
 
-        <div class="mt-5 grid gap-5 xl:grid-cols-2">
+        <div class="mt-7 grid gap-6 xl:grid-cols-2">
             @foreach ($levels as $level)
                 @php($levelBag = $errors->getBag('level-'.$level->id))
                 <form method="POST" action="{{ route('membership-settings.levels.update', $level) }}" class="rounded-2xl border border-brand-border bg-brand-canvas/40 p-5 sm:p-6">
@@ -167,8 +167,8 @@
                     @method('PATCH')
                     <input type="hidden" name="is_active" value="{{ $level->isRequired() ? 1 : 0 }}">
 
-                    <div class="flex items-center justify-between gap-3 border-b border-brand-border/70 pb-4">
-                        <span class="text-xs font-bold uppercase tracking-[0.12em] text-brand-primary">Membership level</span>
+                    <div class="flex items-center justify-between gap-3 border-b border-brand-border/70 pb-5">
+                        <h3 class="min-w-0 truncate text-lg font-bold text-slate-950">{{ $level->name }}</h3>
                         <div class="flex items-center gap-2">
                             @if ($level->isRequired())
                                 <span class="rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-bold text-brand-primary">Required</span>
