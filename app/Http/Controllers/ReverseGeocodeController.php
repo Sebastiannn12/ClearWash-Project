@@ -47,9 +47,19 @@ class ReverseGeocodeController extends Controller
                 Log::warning('Nominatim reverse geocoding response is missing display_name.', ['status' => $response->status()]);
             }
         } catch (ConnectionException $exception) {
-            preg_match('/cURL error (\d+)/', $exception->getMessage(), $matches);
+            $previous = $exception->getPrevious();
+            $sanitize = static function (string $message): string {
+                $message = preg_replace('~https?://\S+~i', '[URL redacted]', $message);
+                $message = preg_replace('/\b(?:api[_-]?key|token|password|secret|authorization)\s*[:=]\s*\S+/i', '[credential redacted]', $message);
+
+                return mb_substr($message, 0, 500);
+            };
+            preg_match('/cURL error (\d+)/', $exception->getMessage().' '.($previous?->getMessage() ?? ''), $matches);
             Log::warning('Nominatim reverse geocoding connection failed.', [
                 'exception' => $exception::class,
+                'message' => $sanitize($exception->getMessage()),
+                'previous_exception' => $previous ? $previous::class : null,
+                'previous_message' => $previous ? $sanitize($previous->getMessage()) : null,
                 'curl_error' => isset($matches[1]) ? (int) $matches[1] : null,
             ]);
 
