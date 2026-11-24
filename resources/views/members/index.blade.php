@@ -16,9 +16,9 @@
     @endif
 
     <div class="mt-8 grid gap-4 sm:grid-cols-3">
-        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Total members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($totalMembers) }}</p></div>
-        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Active members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($activeMembers) }}</p></div>
-        <div class="rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><p class="text-sm font-semibold text-brand-sidebar">Inactive members</p><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($inactiveMembers) }}</p></div>
+        <div class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><p class="text-sm font-semibold text-brand-sidebar">Total members</p><span class="flex size-10 items-center justify-center rounded-xl bg-brand-canvas text-brand-primary" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path stroke-linecap="round" d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 5"/></svg></span></div><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($totalMembers) }}</p></div>
+        <div class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><p class="text-sm font-semibold text-brand-sidebar">Active members</p><span class="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="m8 12 2.5 2.5L16 9"/></svg></span></div><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($activeMembers) }}</p></div>
+        <div class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><p class="text-sm font-semibold text-brand-sidebar">Inactive members</p><span class="flex size-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M8 12h8"/></svg></span></div><p class="mt-5 text-3xl font-bold tracking-tight text-brand-sidebar tabular-nums">{{ number_format($inactiveMembers) }}</p></div>
     </div>
 
     <section class="mt-8 overflow-hidden rounded-2xl border border-brand-border bg-white" aria-labelledby="directory-heading">
@@ -45,7 +45,7 @@
         @else
             <div class="divide-y divide-brand-border xl:hidden">
                 @foreach ($members as $member)
-                    <article class="p-5 sm:p-6">
+                    <article class="cw-hover-record p-5 sm:p-6">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <h3 class="font-semibold text-slate-900">{{ $member->full_name }}</h3>
@@ -83,7 +83,7 @@
                     <thead class="border-y border-brand-border bg-brand-canvas text-xs font-bold uppercase tracking-[0.08em] text-brand-sidebar"><tr><th scope="col" class="px-6 py-3.5">Member</th><th scope="col" class="px-5 py-3.5">Membership no.</th><th scope="col" class="px-5 py-3.5">Category</th><th scope="col" class="px-5 py-3.5">Level</th><th scope="col" class="px-5 py-3.5">Status</th><th scope="col" class="px-6 py-3.5 text-right">Actions</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($members as $member)
-                            <tr class="hover:bg-brand-canvas/70">
+                            <tr class="cw-hover-record">
                                 <td class="px-6 py-4"><div class="font-semibold text-slate-900">{{ $member->full_name }}</div><div class="mt-0.5 text-xs text-slate-500">{{ $member->email ?: $member->phone }}</div></td>
                                 <td class="px-5 py-4 font-mono text-xs text-slate-600">{{ $member->membership_number }}</td>
                                 <td class="px-5 py-4 text-slate-700">{{ $member->membershipCategory?->name ?? $member->category }}</td>

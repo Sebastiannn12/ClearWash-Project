@@ -6,7 +6,7 @@
     <title>Membership record · {{ $member->membership_number }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-brand-canvas p-5 font-sans text-brand-sidebar sm:p-10 print:bg-white print:p-0">
+<body class="cw-print-page bg-brand-canvas p-5 font-sans text-brand-sidebar sm:p-10 print:bg-white print:p-0">
     @php($latestTransaction = $member->membershipTransactions->first())
     <main class="mx-auto max-w-2xl rounded-2xl border border-brand-border bg-white p-6 shadow-sm sm:p-10 print:border-0 print:shadow-none">
         <div class="flex items-start justify-between gap-4 border-b border-brand-border pb-6">

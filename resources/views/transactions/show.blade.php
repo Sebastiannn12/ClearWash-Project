@@ -44,7 +44,7 @@
 
     <div class="mt-8 grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         <div class="space-y-6">
-            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+            <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Transaction information</h2>
                 <dl class="mt-6 grid gap-x-6 gap-y-6 sm:grid-cols-2">
                     <div>
@@ -91,7 +91,7 @@
                 </div>
             </section>
 
-            <section class="overflow-hidden rounded-2xl border border-brand-border bg-white">
+            <section class="cw-hover-surface overflow-hidden rounded-2xl border border-brand-border bg-white">
                 <div class="border-b border-brand-border px-5 py-5 sm:px-7">
                     <h2 class="text-lg font-bold text-slate-950">Payment history</h2>
                     <p class="mt-1 text-sm font-medium text-slate-600">Payments recorded for this transaction.</p>
@@ -102,7 +102,7 @@
         </div>
 
         <aside class="space-y-6">
-            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+            <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Payment summary</h2>
                 <dl class="mt-5 space-y-5">
                     <div class="flex items-center justify-between gap-4"><dt class="text-sm font-semibold text-slate-600">Original fee</dt><dd class="text-sm font-bold text-slate-950">₱{{ number_format((float) ($transaction->original_fee ?? $transaction->amount_due), 2) }}</dd></div>
@@ -117,7 +117,7 @@
                 @include('transactions._record-payment')
             @endif
 
-            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+            <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Reference</h2>
                 <dl class="mt-5 space-y-5">
                     <div>

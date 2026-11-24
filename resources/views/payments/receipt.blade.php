@@ -6,7 +6,7 @@
     <title>Payment receipt · {{ $payment->payment_reference }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-brand-canvas p-5 font-sans text-slate-900 sm:p-10 print:bg-white print:p-0">
+<body class="cw-print-page bg-brand-canvas p-5 font-sans text-slate-900 sm:p-10 print:bg-white print:p-0">
     @php($transaction = $payment->membershipTransaction)
     @php($member = $transaction->member)
     <main class="mx-auto max-w-2xl rounded-2xl border border-brand-border bg-white p-6 shadow-sm sm:p-10 print:border-0 print:shadow-none">

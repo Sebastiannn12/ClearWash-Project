@@ -9,22 +9,22 @@
 </head>
 <body class="cw-login min-h-screen bg-brand-canvas font-sans text-slate-900 antialiased">
     <main class="min-h-screen lg:grid lg:grid-cols-[minmax(340px,0.8fr)_minmax(520px,1.2fr)]">
-        <section class="cw-login-panel hidden p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-14" aria-label="ClearWash">
+        <section class="cw-login-panel hidden p-10 text-slate-950 dark:text-white lg:flex lg:flex-col lg:justify-between xl:p-14" aria-label="ClearWash">
             <div class="flex items-center gap-3">
                 <span class="cw-logo size-11 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                 <span class="text-xl font-semibold tracking-tight">ClearWash</span>
             </div>
             <div class="max-w-md">
                 <h2 class="text-4xl font-bold leading-tight tracking-tight xl:text-5xl">Car wash subscription management.</h2>
-                <p class="mt-4 max-w-sm text-sm font-medium leading-6 text-slate-300">Member management, transactions, payments, and membership setup in one workspace.</p>
+                <p class="mt-4 max-w-sm text-sm font-medium leading-6 text-slate-600 dark:text-slate-300">Member management, transactions, payments, and membership setup in one workspace.</p>
             </div>
-            <p class="text-xs font-medium text-slate-300">ClearWash administration</p>
+            <p class="text-xs font-medium text-slate-600 dark:text-slate-300">ClearWash administration</p>
         </section>
 
-        <section class="flex min-h-screen items-center justify-center bg-brand-canvas px-5 py-10 sm:px-8">
-            <div class="w-full max-w-md">
-                <div class="mb-4 flex justify-end"><button type="button" class="cw-theme-toggle" data-theme-toggle aria-pressed="false"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5Z"/></svg><span data-theme-label>Dark mode</span></button></div>
-                <div class="mb-8 flex items-center gap-3 lg:hidden">
+        <section class="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">
+            <div class="cw-login-shell w-full max-w-md">
+                <div class="cw-login-theme mb-4 flex justify-end"><button type="button" class="cw-theme-toggle" data-theme-toggle aria-pressed="false"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5Z"/></svg><span data-theme-label>Dark mode</span></button></div>
+                <div class="cw-login-brand mb-8 flex items-center gap-3 lg:hidden">
                     <span class="cw-logo size-10 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                     <span class="text-xl font-bold tracking-tight text-slate-950">ClearWash</span>
                 </div>
@@ -37,12 +37,22 @@
                     @csrf
                     <div>
                         <label for="email" class="text-sm font-bold text-slate-800">Email address</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username" maxlength="255" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror class="mt-2 w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 focus:border-brand-primary focus:ring-3 focus:ring-brand-border {{ $errors->has('email') ? 'border-red-300' : 'border-brand-border' }}">
+                        <div class="cw-login-field-wrap relative">
+                            <svg class="cw-login-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="m4 7 8 6 8-6"/></svg>
+                            <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus autocomplete="username" maxlength="255" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror class="cw-login-field mt-2 w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 focus:border-brand-primary focus:ring-3 focus:ring-brand-border {{ $errors->has('email') ? 'border-red-300' : 'border-brand-border' }}">
+                        </div>
                         @error('email')<p id="email-error" class="mt-1.5 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="password" class="text-sm font-bold text-slate-800">Password</label>
-                        <input id="password" name="password" type="password" required autocomplete="current-password" @error('password') aria-invalid="true" aria-describedby="password-error" @enderror class="mt-2 w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 focus:border-brand-primary focus:ring-3 focus:ring-brand-border {{ $errors->has('password') ? 'border-red-300' : 'border-brand-border' }}">
+                        <div class="cw-login-field-wrap relative">
+                            <svg class="cw-login-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path stroke-linecap="round" d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                            <input id="password" name="password" type="password" placeholder="Enter your password" required autocomplete="current-password" @error('password') aria-invalid="true" aria-describedby="password-error" @enderror class="cw-login-field mt-2 w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition-[border-color,box-shadow] duration-150 focus:border-brand-primary focus:ring-3 focus:ring-brand-border {{ $errors->has('password') ? 'border-red-300' : 'border-brand-border' }}">
+                            <button type="button" class="cw-password-toggle" data-password-toggle aria-controls="password" aria-label="Show password" aria-pressed="false">
+                                <svg data-password-show-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                                <svg data-password-hide-icon hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 18 18M10.6 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a14.8 14.8 0 0 1-3.2 3.5M6.2 8.3C3.8 10 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6M10 10a2.5 2.5 0 0 0 3.4 3.4"/></svg>
+                            </button>
+                        </div>
                         @error('password')<p id="password-error" class="mt-1.5 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                     </div>
                     <label class="flex items-center gap-2 text-sm font-semibold text-slate-700"><input type="checkbox" name="remember" value="1" @checked(old('remember')) class="size-4 rounded border-brand-border text-brand-primary focus:ring-brand-accent">Remember me</label>

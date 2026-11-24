@@ -59,7 +59,7 @@
         <div class="mt-5 grid gap-5 xl:grid-cols-2">
             @foreach ($categories as $category)
                 @php($categoryBag = $errors->getBag('category-'.$category->id))
-                <form method="POST" action="{{ route('membership-settings.categories.update', $category) }}" class="rounded-2xl border border-brand-border bg-brand-canvas/40 p-5">
+                <form method="POST" action="{{ route('membership-settings.categories.update', $category) }}" class="cw-hover-surface cw-hover-settings rounded-2xl border border-brand-border bg-brand-canvas/40 p-5">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="is_active" value="{{ $category->isRequired() ? 1 : 0 }}">
@@ -162,7 +162,7 @@
         <div class="mt-7 grid gap-6 xl:grid-cols-2">
             @foreach ($levels as $level)
                 @php($levelBag = $errors->getBag('level-'.$level->id))
-                <form method="POST" action="{{ route('membership-settings.levels.update', $level) }}" class="rounded-2xl border border-brand-border bg-brand-canvas/40 p-5 sm:p-6">
+                <form method="POST" action="{{ route('membership-settings.levels.update', $level) }}" class="cw-hover-surface cw-hover-settings rounded-2xl border border-brand-border bg-brand-canvas/40 p-5 sm:p-6">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="is_active" value="{{ $level->isRequired() ? 1 : 0 }}">

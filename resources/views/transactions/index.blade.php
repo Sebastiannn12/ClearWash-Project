@@ -8,7 +8,6 @@
             <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Transactions</h1>
             <p class="mt-2 text-sm leading-6 text-slate-600">Review membership applications, renewals, balances, and statuses.</p>
         </div>
-        <a href="{{ route('transactions.create') }}" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-sidebar">Create transaction</a>
     </div>
 
     <section class="mt-10" aria-labelledby="transaction-list-heading">
@@ -26,19 +25,19 @@
                     \App\TransactionStatus::Expired->value => 'bg-red-50 text-red-800',
                     default => 'bg-amber-50 text-amber-800',
                 })
-                <article class="cw-ledger-row">
+                <article class="cw-ledger-row cw-hover-record">
                     <span class="cw-ledger-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h10a2 2 0 0 1 2 2v16l-3-2-4 2-4-2-3 2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h6"/></svg></span>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <p class="font-semibold text-slate-950">{{ $transaction->member->full_name }}</p>
                             <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span>
                         </div>
-                        <a href="{{ route('transactions.show', $transaction) }}" class="mt-1 inline-block break-all font-mono text-xs font-semibold text-brand-primary hover:underline">{{ $transaction->reference_number }}</a>
+                        <p class="mt-1 break-all font-mono text-xs font-semibold text-brand-primary">{{ $transaction->reference_number }}</p>
                         <p class="mt-1 text-sm text-slate-600">{{ $transaction->type }} · {{ $transaction->level_name ?? $transaction->membershipLevel->name }} · {{ $transaction->created_at->format('M j, Y') }}</p>
                     </div>
                     <div class="flex w-full items-center justify-between gap-5 sm:w-auto sm:justify-end">
                         <strong class="whitespace-nowrap text-lg tabular-nums text-slate-950">₱{{ number_format((float) $transaction->amount_due, 2) }}</strong>
-                        <a href="{{ route('transactions.show', $transaction) }}" class="inline-flex min-h-11 items-center text-sm font-bold text-brand-primary underline-offset-4 hover:underline">Details</a>
+                        <a href="{{ route('transactions.show', $transaction) }}" class="cw-stretched-link inline-flex min-h-11 items-center text-sm font-bold text-brand-primary underline-offset-4" aria-label="View transaction {{ $transaction->reference_number }}">Details <span aria-hidden="true">→</span></a>
                     </div>
                 </article>
             @empty

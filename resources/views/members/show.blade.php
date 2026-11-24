@@ -25,7 +25,7 @@
     </div>
 
     <div class="mt-8 grid max-w-5xl gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(250px,1fr)]">
-        <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+        <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
             <h2 class="text-lg font-bold text-slate-950">Personal information</h2>
             <dl class="mt-6 grid gap-x-6 gap-y-6 sm:grid-cols-2">
                 <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-600">Full name</dt><dd class="mt-1 text-sm font-semibold text-slate-900">{{ $member->full_name }}</dd></div>
@@ -40,7 +40,7 @@
         </section>
 
         <div class="space-y-6">
-            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+            <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Membership</h2>
                 <dl class="mt-5 space-y-5">
                     <div><dt class="text-xs font-bold uppercase tracking-wide text-slate-600">Number</dt><dd class="mt-1 font-mono text-sm font-semibold text-slate-900">{{ $member->membership_number }}</dd></div>
@@ -50,7 +50,7 @@
                 </dl>
             </section>
 
-            <section class="rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
+            <section class="cw-hover-surface rounded-2xl border border-brand-border bg-white p-5 sm:p-7">
                 <h2 class="text-lg font-bold text-slate-950">Account status</h2>
                 <p class="mt-2 text-sm font-medium leading-6 text-slate-600">{{ $member->is_active ? 'Deactivating keeps this member’s records available.' : 'Reactivate this member to mark their account active again.' }}</p>
                 <form method="POST" action="{{ $member->is_active ? route('members.deactivate', $member) : route('members.reactivate', $member) }}" class="mt-5">

@@ -20,10 +20,10 @@
                 \App\TransactionStatus::Expired->value => 'bg-red-50 text-red-800',
                 default => 'bg-amber-50 text-amber-800',
             })
-            <article class="border-b border-brand-border last:border-b-0">
-                <div class="flex flex-wrap items-start justify-between gap-4 px-5 py-5 sm:px-7">
+            <article class="cw-hover-record border-b border-brand-border last:border-b-0">
+                <div class="cw-stretched-row flex flex-wrap items-start justify-between gap-4 px-5 py-5 sm:px-7">
                     <div>
-                        <a href="{{ route('transactions.show', $transaction) }}" class="font-mono text-sm font-bold text-brand-primary hover:underline">{{ $transaction->reference_number }}</a>
+                        <a href="{{ route('transactions.show', $transaction) }}" class="cw-stretched-link font-mono text-sm font-bold text-brand-primary underline-offset-4" aria-label="View transaction {{ $transaction->reference_number }}">{{ $transaction->reference_number }}</a>
                         <p class="mt-1 text-sm font-semibold text-slate-800">{{ $transaction->type }} · {{ $transaction->category_name ?? $member->membershipCategory?->name ?? $member->category }} · {{ $transaction->level_name ?? $transaction->membershipLevel->name }}</p>
                     </div>
                     <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span>
