@@ -24,6 +24,15 @@
 /.agents/
 /.claude/
 /.kiro/
+
+
+# AI Development Files
+/AGENTS.md
+/CLAUDE.md
+/.taste-skill/
+/.mcp.json
+/boost.json
+
 _ide_helper.php
 Homestead.json
 Homestead.yaml
