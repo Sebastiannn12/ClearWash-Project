@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ReverseGeocodeController extends Controller
 {
@@ -32,15 +33,26 @@ class ReverseGeocodeController extends Controller
                 $client = $client->withOptions(['verify' => $caBundle]);
             }
             $response = $client->get('https://nominatim.openstreetmap.org/reverse', [
-                    'format' => 'jsonv2', 'lat' => $latitude, 'lon' => $longitude, 'zoom' => 18,
-                ]);
+                'format' => 'jsonv2', 'lat' => $latitude, 'lon' => $longitude, 'zoom' => 18,
+            ]);
             $address = $response->json('display_name');
             if ($response->successful() && is_string($address) && $address !== '') {
                 Cache::put($cacheKey, $address, now()->addDays(7));
 
                 return response()->json(['address' => $address]);
             }
+            if (! $response->successful()) {
+                Log::warning('Nominatim reverse geocoding request failed.', ['status' => $response->status()]);
+            } else {
+                Log::warning('Nominatim reverse geocoding response is missing display_name.', ['status' => $response->status()]);
+            }
         } catch (ConnectionException $exception) {
+            preg_match('/cURL error (\d+)/', $exception->getMessage(), $matches);
+            Log::warning('Nominatim reverse geocoding connection failed.', [
+                'exception' => $exception::class,
+                'curl_error' => isset($matches[1]) ? (int) $matches[1] : null,
+            ]);
+
             return response()->json(['message' => 'Address lookup is unavailable.'], 503);
         }
 
