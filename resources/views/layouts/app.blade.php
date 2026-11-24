@@ -19,7 +19,8 @@
                 <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
                     <div class="flex items-center gap-3">
                         <button type="button" id="mobile-nav-trigger" class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand-border text-brand-primary lg:hidden" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-navigation" aria-haspopup="dialog"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-                        <span class="cw-logo size-9 rounded-lg lg:hidden"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
+                        <img src="{{ asset('clearwash-logo-themed.png') }}" alt="ClearWash" class="h-9 w-auto max-w-36 object-contain dark:hidden lg:hidden">
+                        <img src="{{ asset('clearwash-logo-dark.png') }}" alt="ClearWash" class="hidden h-9 w-auto max-w-36 object-contain dark:block lg:dark:hidden">
                         <span class="hidden text-sm font-medium text-slate-500 sm:inline"><span>Workspace <span class="mx-2 text-slate-300">/</span></span><span class="font-semibold text-slate-800">{{ request()->routeIs('dashboard') ? 'Dashboard' : (request()->routeIs('membership-settings.categories.*') ? 'Categories' : (request()->routeIs('membership-settings.levels.*') ? 'Levels' : (request()->routeIs('payments.*') ? 'Payments' : (request()->routeIs('transactions.*') ? 'Transactions' : 'Members')))) }}</span></span>
                     </div>
                     <div class="hidden items-center gap-3 lg:flex">

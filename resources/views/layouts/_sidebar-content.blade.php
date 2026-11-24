@@ -1,6 +1,5 @@
-<a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-2 text-white">
-    <span class="cw-logo size-10 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
-    <span class="text-lg font-semibold tracking-tight">ClearWash</span>
+<a href="{{ route('dashboard') }}" class="flex items-center px-2 text-white">
+    <img src="{{ asset('clearwash-logo-dark.png') }}" alt="ClearWash" class="h-10 w-auto max-w-48 object-contain">
 </a>
 <p class="mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Workspace</p>
 <nav class="mt-3 space-y-1" aria-label="Main navigation">

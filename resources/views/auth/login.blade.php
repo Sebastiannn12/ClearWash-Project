@@ -20,16 +20,14 @@
                 <div class="cw-login-theme mb-4 flex justify-end lg:order-4 lg:mb-0 lg:mt-5"><button type="button" class="cw-theme-toggle" data-theme-toggle aria-pressed="false"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5Z" />
                         </svg><span data-theme-label>Dark mode</span></button></div>
-                <div class="cw-login-brand mb-8 flex items-center gap-3 lg:hidden">
-                    <span class="cw-logo size-10 rounded-xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
-                    <span class="text-xl font-bold tracking-tight text-slate-950">ClearWash</span>
+                <div class="cw-login-brand mb-8 lg:hidden">
+                    <img src="{{ asset('clearwash-logo-themed.png') }}" alt="ClearWash" class="h-10 w-auto max-w-full object-contain dark:hidden">
+                    <img src="{{ asset('clearwash-logo-dark.png') }}" alt="ClearWash" class="hidden h-10 w-auto max-w-full object-contain dark:block">
                 </div>
 
                 <div class="mb-8 hidden w-full text-center lg:order-1 lg:block">
-                    <div class="flex items-center justify-center gap-4">
-                        <span class="cw-logo size-16 rounded-2xl"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
-                        <span class="text-4xl font-bold tracking-tight text-slate-950">ClearWash</span>
-                    </div>
+                    <img src="{{ asset('clearwash-logo-themed.png') }}" alt="ClearWash" class="mx-auto h-20 w-auto max-w-full object-contain dark:hidden">
+                    <img src="{{ asset('clearwash-logo-dark.png') }}" alt="ClearWash" class="mx-auto hidden h-20 w-auto max-w-full object-contain dark:block">
                 </div>
 
                 <div class="cw-card w-full rounded-2xl border border-brand-border bg-white p-6 sm:p-10 lg:order-2">
