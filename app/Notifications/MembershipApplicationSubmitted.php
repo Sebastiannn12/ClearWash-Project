@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Notifications;
 
 use App\Models\MembershipTransaction;
+use App\TransactionType;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -29,12 +31,14 @@ class MembershipApplicationSubmitted extends Notification implements ShouldQueue
         $remainingBalance = max(0, (float) $this->transaction->amount_due - $totalPaid);
 
         return (new MailMessage)
-            ->subject('ClearWash Membership Application Received')
+            ->subject($this->transaction->type === TransactionType::Renewal->value
+                ? 'ClearWash Membership Renewal Received'
+                : 'ClearWash Membership Application Received')
             ->view('emails.membership-application', [
                 'transaction' => $this->transaction,
                 'totalPaid' => $totalPaid,
                 'remainingBalance' => $remainingBalance,
             ])
-            ->withSymfonyMessage(fn (Email $message) => $message->embedFromPath(public_path('clearwash-logo.jpg'), 'clearwash-logo', 'image/jpeg'));
+            ->withSymfonyMessage(fn (Email $message) => $message->embedFromPath(public_path('clearwash-email-logo.png'), 'clearwash-logo', 'image/png'));
     }
 }

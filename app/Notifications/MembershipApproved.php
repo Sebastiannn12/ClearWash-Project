@@ -33,6 +33,6 @@ class MembershipApproved extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject($this->eventStatus === 'Approved' ? 'ClearWash Membership Approved' : 'ClearWash Payment Confirmation')
             ->view('emails.membership-approved', ['transaction' => $transaction, 'payment' => $payment, 'paidInCents' => $this->paidInCents, 'receiptUrl' => $receiptUrl, 'eventStatus' => $this->eventStatus])
-            ->withSymfonyMessage(fn (Email $message) => $message->embedFromPath(public_path('clearwash-logo.jpg'), 'clearwash-logo', 'image/jpeg'));
+            ->withSymfonyMessage(fn (Email $message) => $message->embedFromPath(public_path('clearwash-email-logo.png'), 'clearwash-logo', 'image/png'));
     }
 }

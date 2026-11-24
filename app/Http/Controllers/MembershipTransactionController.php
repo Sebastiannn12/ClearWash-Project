@@ -6,17 +6,17 @@ use App\Http\Requests\StoreMembershipTransactionRequest;
 use App\Models\Member;
 use App\Models\MembershipLevel;
 use App\Models\MembershipTransaction;
+use App\Notifications\MembershipApplicationSubmitted;
+use App\Notifications\MembershipApproved;
 use App\TransactionStatus;
 use App\TransactionType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Notifications\MembershipApplicationSubmitted;
-use App\Notifications\MembershipApproved;
-use Illuminate\Support\Facades\Notification;
 
 class MembershipTransactionController extends Controller
 {
@@ -71,8 +71,8 @@ class MembershipTransactionController extends Controller
             if (
                 $validated['type'] === TransactionType::Application->value
                 && MembershipTransaction::where('member_id', $validated['member_id'])
-                ->where('type', TransactionType::Application->value)
-                ->exists()
+                    ->where('type', TransactionType::Application->value)
+                    ->exists()
             ) {
                 throw ValidationException::withMessages([
                     'type' => 'This member already has a membership application.',
@@ -94,12 +94,10 @@ class MembershipTransactionController extends Controller
             ]);
         });
 
-        if ($transaction->type === TransactionType::Application->value) {
-            $transaction->load('member');
+        $transaction->load('member');
 
-            Notification::route('mail', $transaction->member->email)
-                ->notify(new MembershipApplicationSubmitted($transaction));
-        }
+        Notification::route('mail', $transaction->member->email)
+            ->notify(new MembershipApplicationSubmitted($transaction));
 
         return redirect()
             ->route('transactions.show', $transaction)
@@ -120,7 +118,7 @@ class MembershipTransactionController extends Controller
 
         $totalPaid = (float) $transaction->payments->sum('amount');
         $remainingBalance = max(0, (float) $transaction->amount_due - $totalPaid);
-        $paymentSubmissionToken = 'PAY-' . Str::uuid();
+        $paymentSubmissionToken = 'PAY-'.Str::uuid();
 
         return view('transactions.show', compact(
             'transaction',

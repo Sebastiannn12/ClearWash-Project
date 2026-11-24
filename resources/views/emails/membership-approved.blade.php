@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ClearWash Membership Approved</title></head>
 <body style="margin:0;padding:24px 12px;background:#f9f4f5;color:#252328;font-family:Arial,Helvetica,sans-serif;">
 <table role="presentation" style="width:100%;max-width:600px;margin:auto;border-collapse:collapse;background:#fff;border:1px solid #ebdde3;">
-<tr><td style="padding:28px 32px;border-bottom:3px solid #623547;"><img src="cid:clearwash-logo" width="64" alt="ClearWash logo" style="vertical-align:middle;border:0;"> <span style="font-size:22px;font-weight:bold;color:#623547;vertical-align:middle;">ClearWash</span></td></tr>
+<tr><td style="padding:28px 32px;border-bottom:3px solid #623547;"><img src="cid:clearwash-logo" width="280" alt="ClearWash logo" style="display:block;width:280px;max-width:100%;height:auto;border:0;"></td></tr>
 <tr><td style="padding:32px;"><h1 style="margin:0 0 24px;color:#291c24;font-size:24px;">{{ $eventStatus === 'Approved' ? 'Membership approved' : 'Payment confirmation' }}</h1>
 <p style="font-size:16px;line-height:1.6;">Hello {{ $transaction->member->full_name }},</p><p style="font-size:16px;line-height:1.6;">{{ $eventStatus === 'Approved' ? 'Your membership transaction has been approved.' : 'We received your payment.' }}</p>
 <table role="presentation" style="width:100%;border-collapse:collapse;background:#f9f4f5;">
