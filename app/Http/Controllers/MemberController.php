@@ -6,10 +6,12 @@ use App\Models\Member;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
 use App\Models\MembershipTransaction;
+use App\Notifications\MembershipApplicationSubmitted;
 use App\TransactionStatus;
 use App\TransactionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -76,7 +78,7 @@ class MemberController extends Controller
 
             $member = Member::create($validated);
 
-            $member->membershipTransactions()->firstOrCreate(
+            $transaction = $member->membershipTransactions()->firstOrCreate(
                 ['type' => TransactionType::Application->value],
                 [
                     'membership_level_id' => $level->id,
@@ -88,8 +90,13 @@ class MemberController extends Controller
                 ],
             );
 
-            return $member;
+            return [$member, $transaction];
         });
+
+        [$member, $transaction] = $member;
+        $transaction->setRelation('member', $member);
+        Notification::route('mail', $member->email)
+            ->notify(new MembershipApplicationSubmitted($transaction));
 
         return redirect()->route('members.show', $member)->with('success', 'Member registered successfully.');
     }

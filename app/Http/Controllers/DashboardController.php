@@ -17,6 +17,7 @@ class DashboardController extends Controller
             'activeMembers' => Member::where('is_active', true)->count(),
             'pendingTransactions' => MembershipTransaction::where('status', TransactionStatus::Pending->value)->count(),
             'totalCollected' => Payment::sum('amount'),
+            'recentTransactions' => MembershipTransaction::with('member')->latest()->orderByDesc('id')->limit(5)->get(),
         ]);
     }
 }

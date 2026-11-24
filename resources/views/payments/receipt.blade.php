@@ -30,7 +30,7 @@
             <div class="flex justify-between gap-4"><dt>Transaction amount due</dt><dd>₱{{ number_format((float) $transaction->amount_due, 2) }}</dd></div>
             <div class="flex justify-between gap-4 border-t border-brand-border pt-3 text-lg font-bold"><dt>Payment received</dt><dd>₱{{ number_format((float) $payment->amount, 2) }}</dd></div>
         </dl>
-        @if ($payment->notes)<p class="mt-6 whitespace-pre-line text-sm text-slate-600">{{ $payment->notes }}</p>@endif
+        @if ($payment->notes && empty($publicReceipt))<p class="mt-6 whitespace-pre-line text-sm text-slate-600">{{ $payment->notes }}</p>@endif
         <p class="mt-8 border-t border-brand-border pt-4 text-xs text-slate-500">Printed {{ now()->format('M j, Y g:i A') }} · ClearWash</p>
     </main>
 </body>

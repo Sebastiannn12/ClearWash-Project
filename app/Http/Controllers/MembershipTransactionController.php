@@ -14,6 +14,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Notifications\MembershipApplicationSubmitted;
+use App\Notifications\MembershipApproved;
+use App\Notifications\MembershipApproved;
+use Illuminate\Support\Facades\Notification;
 
 class MembershipTransactionController extends Controller
 {
@@ -68,8 +72,8 @@ class MembershipTransactionController extends Controller
             if (
                 $validated['type'] === TransactionType::Application->value
                 && MembershipTransaction::where('member_id', $validated['member_id'])
-                    ->where('type', TransactionType::Application->value)
-                    ->exists()
+                ->where('type', TransactionType::Application->value)
+                ->exists()
             ) {
                 throw ValidationException::withMessages([
                     'type' => 'This member already has a membership application.',
@@ -91,6 +95,13 @@ class MembershipTransactionController extends Controller
             ]);
         });
 
+        if ($transaction->type === TransactionType::Application->value) {
+            $transaction->load('member');
+
+            Notification::route('mail', $transaction->member->email)
+                ->notify(new MembershipApplicationSubmitted($transaction));
+        }
+
         return redirect()
             ->route('transactions.show', $transaction)
             ->with('success', 'Membership transaction created successfully.');
@@ -110,7 +121,7 @@ class MembershipTransactionController extends Controller
 
         $totalPaid = (float) $transaction->payments->sum('amount');
         $remainingBalance = max(0, (float) $transaction->amount_due - $totalPaid);
-        $paymentSubmissionToken = 'PAY-'.Str::uuid();
+        $paymentSubmissionToken = 'PAY-' . Str::uuid();
 
         return view('transactions.show', compact(
             'transaction',
@@ -165,6 +176,10 @@ class MembershipTransactionController extends Controller
                 'membership_level_id' => $lockedTransaction->membership_level_id,
                 'membership_level' => $lockedTransaction->membershipLevel->name,
             ]);
+
+            Notification::route('mail', $member->email)->notify(new MembershipApproved($lockedTransaction, $paidInCents));
+
+            Notification::route('mail', $member->email)->notify(new MembershipApproved($lockedTransaction, $paidInCents));
         });
 
         return redirect()->route('transactions.show', $transaction)->with('success', 'Transaction approved.');

@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Symfony\Component\Mime\Email;
 
 class MembershipApplicationSubmitted extends Notification implements ShouldQueue
 {
@@ -24,13 +25,16 @@ class MembershipApplicationSubmitted extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $totalPaid = (float) $this->transaction->payments()->sum('amount');
+        $remainingBalance = max(0, (float) $this->transaction->amount_due - $totalPaid);
+
         return (new MailMessage)
             ->subject('ClearWash Membership Application Received')
-            ->greeting('Hello ' . $this->transaction->member->name . ',')
-            ->line('We received your membership application.')
-            ->line('Reference number: ' . $this->transaction->reference_number)
-            ->line('Status: Pending')
-            ->line('Keep this reference number for your records.')
-            ->salutation('ClearWash');
+            ->view('emails.membership-application', [
+                'transaction' => $this->transaction,
+                'totalPaid' => $totalPaid,
+                'remainingBalance' => $remainingBalance,
+            ])
+            ->withSymfonyMessage(fn (Email $message) => $message->embedFromPath(public_path('clearwash-logo.jpg'), 'clearwash-logo', 'image/jpeg'));
     }
 }

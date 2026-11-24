@@ -83,4 +83,38 @@
         </div>
     </article>
 </section>
+
+<section class="mt-10" aria-labelledby="recent-transactions-heading">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <h2 id="recent-transactions-heading" class="text-xl font-bold text-slate-950">Recent transactions</h2>
+        <a href="{{ route('transactions.index') }}" class="text-sm font-semibold text-brand-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-accent">View all transactions <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="cw-ledger mt-4">
+        @forelse ($recentTransactions as $transaction)
+            @php($statusClass = match ($transaction->status) {
+                \App\TransactionStatus::Approve->value => 'bg-emerald-50 text-emerald-800',
+                \App\TransactionStatus::Paid->value => 'bg-blue-50 text-blue-800',
+                \App\TransactionStatus::Cancelled->value => 'bg-slate-100 text-slate-600',
+                \App\TransactionStatus::Expired->value => 'bg-red-50 text-red-800',
+                default => 'bg-amber-50 text-amber-800',
+            })
+            <article class="cw-ledger-row cw-hover-record">
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <p class="font-semibold text-slate-950">{{ $transaction->member?->full_name ?? 'Member unavailable' }}</p>
+                        <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusClass }}">{{ $transaction->status }}</span>
+                    </div>
+                    <p class="mt-1 break-all font-mono text-xs font-semibold text-brand-primary">{{ $transaction->reference_number }}</p>
+                    <p class="mt-1 text-sm text-slate-600">{{ $transaction->created_at->format('M j, Y') }}</p>
+                </div>
+                <div class="flex w-full items-center justify-between gap-5 sm:w-auto sm:justify-end">
+                    <strong class="whitespace-nowrap text-lg tabular-nums text-slate-950">₱{{ number_format((float) $transaction->amount_due, 2) }}</strong>
+                    <a href="{{ route('transactions.show', $transaction) }}" class="cw-stretched-link inline-flex min-h-11 items-center text-sm font-bold text-brand-primary underline-offset-4" aria-label="View transaction {{ $transaction->reference_number }}">Details <span aria-hidden="true">→</span></a>
+                </div>
+            </article>
+        @empty
+            <div class="px-6 py-12 text-center"><p class="text-sm font-semibold text-slate-700">No transactions yet.</p></div>
+        @endforelse
+    </div>
+</section>
 @endsection

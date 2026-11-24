@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePaymentRequest;
 use App\Models\MembershipTransaction;
 use App\Models\Payment;
+use App\Notifications\MembershipApproved;
 use App\TransactionStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class PaymentController extends Controller
@@ -57,6 +59,15 @@ class PaymentController extends Controller
         return view('payments.receipt', compact('payment'));
     }
 
+    public function publicReceipt(Payment $payment)
+    {
+        $payment->load(['membershipTransaction.member.membershipCategory', 'membershipTransaction.membershipLevel']);
+
+        return response()->view('payments.receipt', ['payment' => $payment, 'publicReceipt' => true])
+            ->header('Cache-Control', 'private, no-store')
+            ->header('Referrer-Policy', 'no-referrer');
+    }
+
     public function store(StorePaymentRequest $request, MembershipTransaction $transaction): RedirectResponse
     {
         $validated = $request->validated();
@@ -97,7 +108,7 @@ class PaymentController extends Controller
                 ]);
             }
 
-            $lockedTransaction->payments()->create([
+            $payment = $lockedTransaction->payments()->create([
                 'payment_reference' => $validated['payment_reference'],
                 'amount' => number_format($amountInCents / 100, 2, '.', ''),
                 'method' => $validated['method'],
@@ -111,6 +122,11 @@ class PaymentController extends Controller
             ) {
                 $lockedTransaction->update(['status' => TransactionStatus::Paid->value]);
             }
+
+            Notification::route('mail', $lockedTransaction->member->email)->notify(new MembershipApproved(
+                $lockedTransaction, $totalPaidInCents + $amountInCents, $payment->id,
+                $lockedTransaction->status === TransactionStatus::Paid->value ? 'Paid' : 'Partially Paid'
+            ));
         });
 
         return redirect()
