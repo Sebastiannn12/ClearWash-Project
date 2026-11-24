@@ -207,6 +207,8 @@ class MemberController extends Controller
             'membership_category_id' => ['required', Rule::exists('membership_categories', 'id')->where('is_active', true)],
             'membership_level_id' => ['required', Rule::exists('membership_levels', 'id')->where('is_active', true)],
             'address' => ['nullable', 'string', 'max:1000'],
+            'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-180,180'],
             'joined_on' => ['required', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);

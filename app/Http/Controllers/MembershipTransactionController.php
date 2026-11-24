@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\MembershipApplicationSubmitted;
 use App\Notifications\MembershipApproved;
-use App\Notifications\MembershipApproved;
 use Illuminate\Support\Facades\Notification;
 
 class MembershipTransactionController extends Controller
@@ -176,8 +175,6 @@ class MembershipTransactionController extends Controller
                 'membership_level_id' => $lockedTransaction->membership_level_id,
                 'membership_level' => $lockedTransaction->membershipLevel->name,
             ]);
-
-            Notification::route('mail', $member->email)->notify(new MembershipApproved($lockedTransaction, $paidInCents));
 
             Notification::route('mail', $member->email)->notify(new MembershipApproved($lockedTransaction, $paidInCents));
         });

@@ -7,6 +7,7 @@
         @csrf
         <div class="mb-7 border-b border-brand-border/70 pb-5"><h2 class="text-lg font-bold text-slate-950">Member details</h2><p class="mt-1 text-sm font-medium text-slate-600">Fields marked with a dot are required.</p></div>
         @include('members._form')
+        @include('members._location-picker', ['saveCoordinates' => true])
         <div class="mt-6">@include('members._pricing-preview')</div>
         <div class="mt-8 flex flex-col-reverse gap-3 border-t border-brand-border/70 pt-6 sm:flex-row"><a href="{{ route('members.index') }}" class="rounded-xl border border-brand-border px-5 py-2.5 text-center text-sm font-semibold text-slate-800 transition-[background-color,transform] duration-150 hover:bg-brand-canvas active:scale-[0.98]">Cancel</a><button class="rounded-xl bg-brand-primary px-5 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent active:scale-[0.98]">Register member</button></div>
     </form>

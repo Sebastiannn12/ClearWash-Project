@@ -28,7 +28,7 @@
             <select id="member_id" name="member_id" data-price-member required class="{{ $fieldClass }}">
                 <option value="">Select member</option>
                 @foreach ($members as $member)
-                <option value="{{ $member->id }}" data-membership-level-id="{{ $member->membership_level_id }}" data-discount="{{ $member->membershipCategory?->discount_percentage ?? 0 }}" @selected((string) old('member_id')===(string) $member->id)>
+                <option value="{{ $member->id }}" data-address="{{ $member->address }}" data-latitude="{{ $member->latitude }}" data-longitude="{{ $member->longitude }}" data-membership-level-id="{{ $member->membership_level_id }}" data-discount="{{ $member->membershipCategory?->discount_percentage ?? 0 }}" @selected((string) old('member_id')===(string) $member->id)>
                     {{ $member->full_name }}{{ $member->membership_number ? ' · '.$member->membership_number : '' }}
                 </option>
                 @endforeach
@@ -79,6 +79,9 @@
         </div>
     </div>
 
+    <div class="mt-6"><label for="address" class="text-sm font-bold text-slate-700">Address</label><input id="address" type="text" autocomplete="street-address" placeholder="Street, city, province" class="{{ $fieldClass }}"></div>
+    @include('members._location-picker', ['saveCoordinates' => false])
+    <p class="mt-2 text-sm text-slate-600">Location changes here are for the map and weather preview and are not saved.</p>
     <div class="mt-6">@include('members._pricing-preview')</div>
 
     <div class="mt-8 flex flex-col-reverse gap-3 border-t border-brand-border/70 pt-6 sm:flex-row">

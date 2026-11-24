@@ -22,6 +22,8 @@ class Member extends Model
         'membership_level',
         'membership_level_id',
         'address',
+        'latitude',
+        'longitude',
         'joined_on',
         'notes',
         'is_active',
