@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMembershipTransactionRequest;
 use App\Models\Member;
+use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
 use App\Models\MembershipTransaction;
 use App\Notifications\MembershipApplicationSubmitted;
@@ -40,8 +41,9 @@ class MembershipTransactionController extends Controller
         $members = Member::with(['membershipLevel', 'membershipCategory'])->orderBy('first_name')->get();
 
         $levels = MembershipLevel::where('is_active', true)->get();
+        $categories = MembershipCategory::where('is_active', true)->get();
 
-        return view('transactions.create', compact('members', 'levels'));
+        return view('transactions.create', compact('members', 'levels', 'categories'));
     }
 
     /**
@@ -55,10 +57,15 @@ class MembershipTransactionController extends Controller
             $validated['membership_level_id']
         );
         $member = Member::with('membershipCategory')->findOrFail($validated['member_id']);
-        $category = $member->membershipCategory;
+        $category = isset($validated['membership_category_id'])
+            ? MembershipCategory::findOrFail($validated['membership_category_id'])
+            : $member->membershipCategory;
 
         if (! $category) {
             throw ValidationException::withMessages(['member_id' => 'This member has no membership category.']);
+        }
+        if (! $category->is_active) {
+            throw ValidationException::withMessages(['membership_category_id' => 'This membership category is inactive.']);
         }
 
         if (! $level->is_active) {
@@ -84,6 +91,7 @@ class MembershipTransactionController extends Controller
             return MembershipTransaction::create([
                 'member_id' => $validated['member_id'],
                 'membership_level_id' => $level->id,
+                'membership_category_id' => $category->id,
                 'type' => $validated['type'],
                 'status' => (float) $pricing['amount_due'] === 0.0 ? TransactionStatus::Paid->value : TransactionStatus::Pending->value,
                 ...$pricing,
@@ -172,6 +180,10 @@ class MembershipTransactionController extends Controller
             $member->update([
                 'membership_level_id' => $lockedTransaction->membership_level_id,
                 'membership_level' => $lockedTransaction->membershipLevel->name,
+                ...($lockedTransaction->membership_category_id ? [
+                    'membership_category_id' => $lockedTransaction->membership_category_id,
+                    'category' => $lockedTransaction->membershipCategory->name,
+                ] : []),
             ]);
 
             Notification::route('mail', $member->email)->notify(new MembershipApproved($lockedTransaction, $paidInCents));

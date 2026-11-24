@@ -28,7 +28,7 @@
             <select id="member_id" name="member_id" data-price-member required class="{{ $fieldClass }}">
                 <option value="">Select member</option>
                 @foreach ($members as $member)
-                <option value="{{ $member->id }}" data-address="{{ $member->address }}" data-latitude="{{ $member->latitude }}" data-longitude="{{ $member->longitude }}" data-membership-level-id="{{ $member->membership_level_id }}" data-discount="{{ $member->membershipCategory?->discount_percentage ?? 0 }}" @selected((string) old('member_id')===(string) $member->id)>
+                <option value="{{ $member->id }}" data-address="{{ $member->address }}" data-latitude="{{ $member->latitude }}" data-longitude="{{ $member->longitude }}" data-membership-category-id="{{ $member->membership_category_id }}" data-membership-level-id="{{ $member->membership_level_id }}" data-discount="{{ $member->membershipCategory?->discount_percentage ?? 0 }}" @selected((string) old('member_id')===(string) $member->id)>
                     {{ $member->full_name }}{{ $member->membership_number ? ' · '.$member->membership_number : '' }}
                 </option>
                 @endforeach
@@ -36,7 +36,20 @@
             @error('member_id')
             <p class="mt-1 text-xs text-red-700">{{ $message }}</p>
             @enderror
-            <p class="mt-1.5 text-xs font-medium text-slate-500">The member's registered plan is selected automatically. You can change it for an upgrade or plan change.</p>
+            <p class="mt-1.5 text-xs font-medium text-slate-500">The member's category and plan are selected automatically. Confirm category eligibility before changing it. Changes take effect on approval.</p>
+        </div>
+
+        <div class="sm:col-span-2">
+            <label for="membership_category_id" class="cw-required-label text-sm font-medium text-slate-700"><span class="cw-required-dot" aria-hidden="true"></span>Membership category</label>
+            <select id="membership_category_id" name="membership_category_id" data-price-category required class="{{ $fieldClass }}">
+                <option value="">Select category</option>
+                @foreach ($categories as $category)
+                <option value="{{ $category->id }}" data-discount="{{ $category->discount_percentage }}" @selected((string) old('membership_category_id') === (string) $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+            @error('membership_category_id')
+            <p class="mt-1 text-xs text-red-700">{{ $message }}</p>
+            @enderror
         </div>
 
         <div>
@@ -94,10 +107,16 @@
     (() => {
         const memberSelect = document.getElementById('member_id');
         const levelSelect = document.getElementById('membership_level_id');
+        const categorySelect = document.getElementById('membership_category_id');
         const planSummary = document.getElementById('plan-summary');
         const planFee = document.getElementById('plan-fee');
         const planValidity = document.getElementById('plan-validity');
         const hasOldLevel = @json(old('membership_level_id') !== null);
+        const hasOldCategory = @json(old('membership_category_id') !== null);
+        const selectMemberCategory = () => {
+            categorySelect.value = memberSelect.selectedOptions[0]?.dataset.membershipCategoryId || '';
+            categorySelect.dispatchEvent(new Event('change'));
+        };
 
         const updatePlanSummary = () => {
             const selectedLevel = levelSelect.options[levelSelect.selectedIndex];
@@ -137,6 +156,7 @@
         };
 
         memberSelect.addEventListener('change', selectMemberLevel);
+        memberSelect.addEventListener('change', selectMemberCategory);
         levelSelect.addEventListener('change', updatePlanSummary);
 
         if (hasOldLevel) {
@@ -144,6 +164,7 @@
         } else if (memberSelect.value) {
             selectMemberLevel();
         }
+        if (!hasOldCategory && memberSelect.value) selectMemberCategory();
     })();
 </script>
 @endsection

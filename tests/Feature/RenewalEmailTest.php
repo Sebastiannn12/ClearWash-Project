@@ -30,15 +30,28 @@ class RenewalEmailTest extends TestCase
         ])->assertRedirect()->assertSessionHasNoErrors();
         $member = Member::where('email', 'alex@example.com')->firstOrFail();
         $application = $member->membershipTransactions()->sole();
-        $level = MembershipLevel::where('name', 'Silver')->firstOrFail();
+        $applicationSnapshot = $application->getAttributes();
+        $originalCategoryId = $member->membership_category_id;
+        $originalLevelId = $member->membership_level_id;
+        $level = MembershipLevel::where('name', 'Gold')->firstOrFail();
+        $level->update(['fee' => 1000]);
+        $category = MembershipCategory::where('name', 'Student')->firstOrFail();
+        $category->update(['discount_percentage' => 15]);
         Notification::fake();
 
         $this->post(route('transactions.store'), [
             'member_id' => $member->id, 'membership_level_id' => $level->id,
+            'membership_category_id' => $category->id,
             'type' => 'Renewal',
         ])->assertRedirect()->assertSessionHasNoErrors();
 
         $renewal = $member->membershipTransactions()->where('type', 'Renewal')->sole();
+        $this->assertSame('1000.00', $renewal->original_fee);
+        $this->assertSame('15.00', $renewal->discount_percentage);
+        $this->assertSame('150.00', $renewal->discount_amount);
+        $this->assertSame('850.00', $renewal->amount_due);
+        $this->assertSame($originalCategoryId, $member->fresh()->membership_category_id);
+        $this->assertSame($originalLevelId, $member->fresh()->membership_level_id);
         Notification::assertSentOnDemand(MembershipApplicationSubmitted::class,
             function ($notification, $channels, $notifiable) use ($renewal, $member): bool {
                 $mail = $notification->toMail($notifiable);
@@ -68,5 +81,11 @@ class RenewalEmailTest extends TestCase
 
                 return $notification->transaction->is($renewal);
             });
+
+        $this->patch(route('transactions.approve', $renewal))->assertRedirect()->assertSessionHasNoErrors();
+
+        $this->assertSame($category->id, $member->fresh()->membership_category_id);
+        $this->assertSame($level->id, $member->fresh()->membership_level_id);
+        $this->assertSame($applicationSnapshot, $application->fresh()->getAttributes());
     }
 }

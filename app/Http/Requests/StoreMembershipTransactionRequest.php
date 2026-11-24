@@ -26,6 +26,7 @@ class StoreMembershipTransactionRequest extends FormRequest
             'member_id' => 'required|exists:members,id',
 
             'membership_level_id' => 'required|exists:membership_levels,id',
+            'membership_category_id' => 'required_if:type,Renewal|nullable|exists:membership_categories,id',
 
             'type' => 'required|in:Application,Renewal',
 

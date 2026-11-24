@@ -16,6 +16,7 @@ class MembershipTransaction extends Model
     protected $fillable = [
         'member_id',
         'membership_level_id',
+        'membership_category_id',
         'type',
         'status',
         'amount_due',
@@ -65,6 +66,11 @@ class MembershipTransaction extends Model
     public function membershipLevel(): BelongsTo
     {
         return $this->belongsTo(MembershipLevel::class);
+    }
+
+    public function membershipCategory(): BelongsTo
+    {
+        return $this->belongsTo(MembershipCategory::class);
     }
 
     public function payments(): HasMany
