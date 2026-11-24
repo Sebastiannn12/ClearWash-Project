@@ -1,6 +1,7 @@
 .git
 .env
 .env.*
+render.env
 !.env.example
 vendor
 node_modules
