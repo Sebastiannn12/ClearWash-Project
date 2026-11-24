@@ -3,6 +3,11 @@
 return [
     'google_maps' => ['key' => env('GOOGLE_MAPS_KEY')],
     'openweather' => ['key' => env('OPENWEATHER_KEY'), 'ca_bundle' => env('OPENWEATHER_CA_BUNDLE')],
+    'reverse_geocoding' => [
+        'provider' => env('REVERSE_GEOCODING_PROVIDER', 'nominatim'),
+        'fallback' => env('REVERSE_GEOCODING_FALLBACK', 'openweather'),
+        'ca_bundle' => env('REVERSE_GEOCODING_CA_BUNDLE', env('OPENWEATHER_CA_BUNDLE')),
+    ],
 
     /*
     |--------------------------------------------------------------------------
