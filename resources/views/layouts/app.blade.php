@@ -16,16 +16,13 @@
 
         <div class="cw-app-pane min-w-0 flex-1 bg-white">
             <header class="cw-header border-b border-brand-border">
-                <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
+                <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
                     <div class="flex items-center gap-3">
                         <button type="button" id="mobile-nav-trigger" class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand-border text-brand-primary lg:hidden" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-navigation" aria-haspopup="dialog"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
                         <span class="cw-logo size-9 rounded-lg lg:hidden"><img src="{{ asset('clearwash-logo.jpg') }}" alt="ClearWash logo"></span>
                         <span class="hidden text-sm font-medium text-slate-500 sm:inline"><span>Workspace <span class="mx-2 text-slate-300">/</span></span><span class="font-semibold text-slate-800">{{ request()->routeIs('dashboard') ? 'Dashboard' : (request()->routeIs('membership-settings.categories.*') ? 'Categories' : (request()->routeIs('membership-settings.levels.*') ? 'Levels' : (request()->routeIs('payments.*') ? 'Payments' : (request()->routeIs('transactions.*') ? 'Transactions' : 'Members')))) }}</span></span>
                     </div>
                     <div class="hidden items-center gap-3 lg:flex">
-                        @if (request()->routeIs('transactions.index'))
-                            <a href="{{ route('transactions.create') }}" class="hidden rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-sidebar focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent sm:inline-flex">+ Create Transaction</a>
-                        @endif
                         <button type="button" class="cw-theme-toggle" data-theme-toggle aria-pressed="false"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5Z"/></svg><span class="hidden sm:inline" data-theme-label>Dark mode</span><span class="sr-only sm:hidden" data-theme-label>Dark mode</span></button>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
