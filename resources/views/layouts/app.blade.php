@@ -15,7 +15,7 @@
         </aside>
 
         <div class="cw-app-pane min-w-0 flex-1 bg-white">
-            <header class="cw-header border-b border-brand-border">
+            <header class="cw-header sticky top-0 z-30 border-b border-brand-border">
                 <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
                     <div class="flex items-center gap-3">
                         <button type="button" id="mobile-nav-trigger" class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-brand-border text-brand-primary lg:hidden" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-navigation" aria-haspopup="dialog"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
