@@ -30,10 +30,22 @@
 }
 
 @layer base {
+    :root {
+        --cw-button-bg: #754357;
+        --cw-button-hover: #623547;
+        --cw-button-active: #542d3f;
+        --cw-button-edge: var(--cw-button-bg);
+        --cw-button-focus: #623547;
+    }
     .dark {
+        --cw-button-bg: #75495d;
+        --cw-button-hover: #85546a;
+        --cw-button-active: #633b4d;
+        --cw-button-edge: var(--cw-button-bg);
+        --cw-button-focus: #c4acb6;
         color-scheme: dark;
         --color-brand-sidebar: #151518;
-        --color-brand-primary: #7e495d;
+        --color-brand-primary: #583443;
         --color-brand-accent: #c895a8;
         --color-brand-canvas: #101012;
         --color-brand-outer: #252328;
@@ -142,8 +154,8 @@
         border-right: 1px solid #343036;
     }
     .cw-sidebar nav a { min-height: 46px; }
-    .cw-sidebar nav a.text-white { background: #623547; }
-    .cw-sidebar nav a { transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+    .cw-sidebar nav a.text-white { background: var(--color-brand-primary); }
+    .cw-sidebar nav a { transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease, transform 240ms var(--ease-ui-out); }
     @media (hover: hover) and (pointer: fine) {
         .cw-sidebar nav a:hover { background-color: #563143; color: #fff; transform: translateY(-1px); box-shadow: 0 6px 14px -10px rgba(0,0,0,.7); }
         :is(.cw-workspace, .cw-header, .cw-login, .cw-print-page, dialog) :is(button:not(:disabled), a[class*="rounded"]):hover {
@@ -171,7 +183,7 @@
         outline-offset: 3px;
     }
     .cw-workspace :where(button, a[class*="rounded"]), .cw-login :where(button) {
-        transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms cubic-bezier(.23,1,.32,1);
+        transition: background-color 220ms ease, box-shadow 220ms ease, transform 240ms var(--ease-ui-out);
     }
     .cw-workspace :where(button):active { transform: scale(.98); }
     dialog { box-shadow: 0 28px 80px -24px rgba(0,0,0,.5); }
@@ -296,6 +308,32 @@
         outline-offset: -3px;
     }
     .cw-stretched-link:focus-visible { outline: none !important; }
+
+    section[aria-label="ClearWash overview"] {
+        --dashboard-edge: #b29ba5;
+        --dashboard-focus: #623547;
+        --dashboard-shadow: rgb(41 28 36 / 18%);
+    }
+    .dark section[aria-label="ClearWash overview"] {
+        --dashboard-edge: #756970;
+        --dashboard-focus: #c4acb6;
+        --dashboard-shadow: rgb(0 0 0 / 45%);
+    }
+    section[aria-label="ClearWash overview"] > .cw-hover-surface:has(.cw-stretched-link:focus-visible) {
+        outline-color: var(--dashboard-focus);
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .cw-workspace section[aria-label="ClearWash overview"] > .cw-hover-surface:hover {
+            border-color: var(--dashboard-edge);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px -18px var(--dashboard-shadow);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .cw-workspace section[aria-label="ClearWash overview"] > .cw-hover-surface:hover {
+            transform: none;
+        }
+    }
     .cw-hover-surface:hover .cw-stretched-link,
     .cw-stretched-row:hover .cw-stretched-link { text-decoration: underline; }
 
@@ -304,7 +342,7 @@
         position: relative;
         z-index: 0;
         transform-origin: center;
-        transition: transform 180ms var(--ease-ui-out), background-color 150ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        transition: transform 240ms var(--ease-ui-out), background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -348,7 +386,7 @@
         min-height: 7.75rem;
         padding: 1.25rem 1.5rem;
         border-bottom: 1.5px solid var(--color-brand-divider);
-        transition: background-color 150ms ease;
+        transition: background-color 220ms ease;
     }
 
     .cw-ledger-row:last-child { border-bottom: 0; }
@@ -403,7 +441,7 @@
         background: #fff;
         font-size: .8125rem;
         font-weight: 700;
-        transition: background-color .15s ease, transform .15s cubic-bezier(.23,1,.32,1);
+        transition: background-color 220ms ease, transform 240ms var(--ease-ui-out);
     }
     .cw-theme-toggle:hover { background: #f5eff1; }
     .cw-theme-toggle:active { transform: scale(.98); }
@@ -426,7 +464,6 @@
 }
 
 @layer utilities {
-    html:not(.dark) .cw-member-search { background-color: #151518; }
     .dark dialog.cw-mobile-navigation { background: transparent; }
     .cw-workspace :is(section, article, form).border-brand-border { border-width: 1.5px; }
     html:not(.dark) .cw-workspace :is(section[aria-labelledby="categories-heading"], section[aria-labelledby="levels-heading"]) {
@@ -454,7 +491,8 @@
     .dark .text-slate-500, .dark .text-slate-400 { color: #ccc; }
     .dark .text-brand-sidebar, .dark .text-brand-primary, .dark .text-brand-accent { color: #fff; }
     .dark .cw-login .cw-card.bg-white { border-color: #484047; }
-    .dark .bg-brand-primary { background-color: #7e495d; }
+    .bg-brand-primary,
+    .dark .bg-brand-primary { background-color: var(--color-brand-primary); }
     .dark .bg-brand-sidebar { background-color: #151518; }
     .dark .bg-brand-canvas { background-color: #101012; }
     .dark .bg-emerald-50 { background-color: #193c32; }
@@ -580,12 +618,10 @@
         .cw-login .cw-card form button[type=submit] {
             min-height: 52px;
             border-radius: .875rem;
-            background: linear-gradient(125deg, #6c3b50, #542d3f);
             box-shadow: 0 9px 20px -13px rgba(98, 53, 71, .75);
         }
 
         .dark .cw-login .cw-card form button[type=submit] {
-            background: linear-gradient(125deg, #8b5369, #69394d);
             box-shadow: 0 9px 22px -13px rgba(0, 0, 0, .85);
         }
 
@@ -654,6 +690,49 @@
     }
 }
 
+/* Shared primary actions keep their own colors separate from branding and navigation. */
+@layer utilities {
+    :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary,
+    .cw-login .cw-card form button[type=submit] {
+        background: var(--cw-button-bg);
+        color: #fff;
+        outline: 1px solid var(--cw-button-edge);
+        outline-offset: -1px;
+        transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms var(--ease-ui-out);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary:not(:disabled):not([aria-disabled=true]):hover,
+        .cw-login .cw-card form button[type=submit]:not(:disabled):hover {
+            background: var(--cw-button-hover);
+        }
+    }
+
+    :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary:not(:disabled):not([aria-disabled=true]):active,
+    .cw-login .cw-card form button[type=submit]:not(:disabled):active {
+        background: var(--cw-button-active);
+        transform: scale(.98);
+        transition-duration: 100ms;
+    }
+
+    :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary:focus-visible,
+    .cw-login .cw-card form button[type=submit]:focus-visible {
+        outline: 2px solid var(--cw-button-focus);
+        outline-offset: 3px;
+        transition: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary,
+        :is(.cw-workspace, .cw-header, .cw-print-page, dialog) :is(button, a).bg-brand-primary:not(:disabled):not([aria-disabled=true]):is(:hover, :active),
+        .cw-login .cw-card form button[type=submit],
+        .cw-login .cw-card form button[type=submit]:not(:disabled):is(:hover, :active) {
+            transform: none;
+            transition: none;
+        }
+    }
+}
+
 /* Login-only lighting: pearl in daylight, charcoal and burgundy at night. */
 @layer utilities {
     .cw-login > main {
@@ -688,7 +767,6 @@
     }
 
     .cw-login button[type=submit] {
-        background: linear-gradient(115deg, #734257, #623547 55%, #502b3c);
         box-shadow: 0 8px 20px -12px rgb(98 53 71 / 65%);
     }
 
@@ -696,6 +774,7 @@
         outline: 2px solid #a9677d;
         outline-offset: 4px;
     }
+
 
     @media (max-width: 767px) {
         .cw-login .cw-login-shell {
