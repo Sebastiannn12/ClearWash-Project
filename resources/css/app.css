@@ -472,6 +472,19 @@
     html:not(.dark) .cw-workspace .cw-hover-settings {
         background: linear-gradient(135deg, #fff 0%, #f7f1f3 100%);
     }
+    .dark .cw-workspace :is(section[aria-labelledby="levels-heading"], section[aria-labelledby="categories-heading"]) {
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
+    .dark .cw-workspace :is(section[aria-labelledby="levels-heading"], section[aria-labelledby="categories-heading"]) .cw-hover-settings {
+        background: linear-gradient(150deg, #2b282d, #242226);
+        border-color: #484149;
+        box-shadow: 0 12px 28px -24px rgb(0 0 0 / 55%);
+    }
+    .dark .cw-workspace :is(section[aria-labelledby="levels-heading"], section[aria-labelledby="categories-heading"]) .cw-hover-settings > :is(.border-b, .border-t) {
+        border-color: #403a42;
+    }
     .cw-workspace :is(section, article).border-brand-border\/70 { border-width: 1.5px; }
     .cw-workspace input::placeholder, .cw-workspace textarea::placeholder, .cw-login input::placeholder { color: #746b76; opacity: 1; }
     .cw-transactions-table :is(th, td) { white-space: normal; overflow-wrap: anywhere; padding-left: 1rem; padding-right: 1rem; }
