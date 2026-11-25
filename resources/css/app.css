@@ -653,3 +653,66 @@
         letter-spacing: -0.006em;
     }
 }
+
+/* Login-only lighting: pearl in daylight, charcoal and burgundy at night. */
+@layer utilities {
+    .cw-login > main {
+        background:
+            radial-gradient(ellipse 85% 90% at 0% 100%, #452331 0%, transparent 75%),
+            radial-gradient(ellipse 65% 60% at 100% 0%, #30242d 0%, transparent 80%),
+            #101012;
+    }
+
+    .cw-login > main::before {
+        background:
+            radial-gradient(ellipse 80% 85% at 0% 100%, #dfcbd3 0%, #f3e9ed 36%, transparent 76%),
+            radial-gradient(ellipse 70% 65% at 100% 0%, #eeeef2 0%, transparent 78%),
+            linear-gradient(135deg, #ffffff 24%, #fcfafb 72%, #f5eff2);
+    }
+
+    .dark .cw-login > main {
+        background:
+            radial-gradient(ellipse 85% 90% at 0% 100%, #452331 0%, transparent 75%),
+            radial-gradient(ellipse 65% 60% at 100% 0%, #30242d 0%, transparent 80%),
+            #101012;
+    }
+
+    .cw-login .cw-card {
+        box-shadow: 0 24px 64px -40px rgb(53 29 42 / 35%);
+    }
+
+    .dark .cw-login .cw-card.bg-white {
+        background: linear-gradient(145deg, #29252b 0%, #201d23 58%, #2b1f27 100%);
+        border-color: #484047;
+        box-shadow: 0 28px 70px -38px rgb(0 0 0 / 75%);
+    }
+
+    .cw-login button[type=submit] {
+        background: linear-gradient(115deg, #734257, #623547 55%, #502b3c);
+        box-shadow: 0 8px 20px -12px rgb(98 53 71 / 65%);
+    }
+
+    .cw-login button[type=submit]:focus-visible {
+        outline: 2px solid #a9677d;
+        outline-offset: 4px;
+    }
+
+    @media (max-width: 767px) {
+        .cw-login .cw-login-shell {
+            background: radial-gradient(ellipse at 0% 0%, #e7d5dd, #f9f4f5 80%);
+        }
+
+        .dark .cw-login .cw-login-shell {
+            background: radial-gradient(ellipse at 0% 0%, #452331, #201d23 85%);
+        }
+
+        .cw-login .cw-login-brand {
+            background: transparent;
+        }
+
+        .cw-login .cw-card,
+        .dark .cw-login .cw-card.bg-white {
+            box-shadow: none;
+        }
+    }
+}
