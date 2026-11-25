@@ -18,7 +18,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <h2 id="categories-heading" class="text-2xl font-bold text-slate-950">Member categories</h2>
-                <p class="mt-1 text-sm font-medium text-slate-600">The four required categories are protected. Additional categories can be created and managed here.</p>
+                <p class="mt-1 text-sm font-medium text-slate-600">Categories can be deleted only when no member or transaction references them.</p>
             </div>
             <button type="button" onclick="document.getElementById('add-category-modal').showModal()" class="shrink-0 rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Add category</button>
         </div>
@@ -100,9 +100,7 @@
                     </div>
 
                     <div class="mt-5 flex flex-wrap justify-end gap-2 border-t border-brand-border/70 pt-4">
-                        @unless ($category->isRequired())
                             <button type="button" onclick="document.getElementById('delete-category-{{ $category->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
-                        @endunless
                         <button type="submit" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Save category</button>
                     </div>
                 </form>
@@ -208,9 +206,7 @@
                     </div>
 
                     <div class="mt-5 flex flex-wrap justify-end gap-2 border-t border-brand-border/70 pt-4">
-                        @unless ($level->isRequired())
                             <button type="button" onclick="document.getElementById('delete-level-{{ $level->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
-                        @endunless
                         <button type="submit" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Save level</button>
                     </div>
                 </form>
@@ -220,16 +216,16 @@
 
     @endif
     @if ($page === 'categories')
-    @foreach ($categories->reject->isRequired() as $category)
+    @foreach ($categories as $category)
         @include('membership-settings._delete-modal', [
             'modalId' => 'delete-category-'.$category->id,
             'recordName' => $category->name.' category',
-            'warning' => 'The category can be deleted only when no member is assigned to it.',
+            'warning' => 'The category can be deleted only when no member or transaction references it. Existing history is protected.',
             'action' => route('membership-settings.categories.destroy', $category),
         ])
     @endforeach
     @else
-    @foreach ($levels->reject->isRequired() as $level)
+    @foreach ($levels as $level)
         @include('membership-settings._delete-modal', [
             'modalId' => 'delete-level-'.$level->id,
             'recordName' => $level->name.' membership level',

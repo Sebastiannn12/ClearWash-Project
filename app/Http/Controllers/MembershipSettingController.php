@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
 use App\Models\MembershipCategory;
 use App\Models\MembershipLevel;
+use App\Models\MembershipTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -71,18 +73,22 @@ class MembershipSettingController extends Controller
 
     public function destroyCategory(MembershipCategory $membershipCategory)
     {
-        if ($membershipCategory->isRequired()) {
-            return redirect()->route('membership-settings.categories.index')
-                ->with('error', 'Required categories cannot be deleted.');
-        }
+        $deleted = DB::transaction(function () use ($membershipCategory): bool {
+            $category = MembershipCategory::lockForUpdate()->findOrFail($membershipCategory->id);
+            if (Member::withTrashed()->where('membership_category_id', $category->id)->orWhere('category', $category->name)->exists()
+                || MembershipTransaction::where('membership_category_id', $category->id)->orWhere('category_name', $category->name)->exists()) {
+                return false;
+            }
 
-        if ($membershipCategory->members()->exists()) {
+            return $category->delete();
+        });
+
+        if (! $deleted) {
             return redirect()->route('membership-settings.categories.index')
-                ->with('error', "{$membershipCategory->name} cannot be deleted because it is assigned to one or more members.");
+                ->with('error', "{$membershipCategory->name} cannot be deleted because it is referenced by members or transactions.");
         }
 
         $name = $membershipCategory->name;
-        $membershipCategory->delete();
 
         return redirect()->route('membership-settings.categories.index')
             ->with('success', "{$name} category deleted.");
@@ -126,18 +132,22 @@ class MembershipSettingController extends Controller
 
     public function destroyLevel(MembershipLevel $membershipLevel)
     {
-        if ($membershipLevel->isRequired()) {
-            return redirect()->route('membership-settings.levels.index')
-                ->with('error', 'Required membership levels cannot be deleted.');
-        }
+        $deleted = DB::transaction(function () use ($membershipLevel): bool {
+            $level = MembershipLevel::lockForUpdate()->findOrFail($membershipLevel->id);
+            if (Member::withTrashed()->where('membership_level_id', $level->id)->orWhere('membership_level', $level->name)->exists()
+                || MembershipTransaction::where('membership_level_id', $level->id)->orWhere('level_name', $level->name)->exists()) {
+                return false;
+            }
 
-        if ($membershipLevel->members()->exists() || $membershipLevel->membershipTransactions()->exists()) {
+            return $level->delete();
+        });
+
+        if (! $deleted) {
             return redirect()->route('membership-settings.levels.index')
                 ->with('error', "{$membershipLevel->name} cannot be deleted because it is referenced by members or transactions.");
         }
 
         $name = $membershipLevel->name;
-        $membershipLevel->delete();
 
         return redirect()->route('membership-settings.levels.index')
             ->with('success', "{$name} membership level deleted.");
