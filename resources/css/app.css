@@ -55,6 +55,27 @@
 }
 
 @layer components {
+    .cw-delete-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        min-height: 44px;
+        padding: .625rem .875rem;
+        border: 1px solid #b86679;
+        border-radius: .75rem;
+        background: #fff0f3;
+        color: #8e2e44;
+        font-size: .875rem;
+        font-weight: 600;
+        transition: background-color 200ms ease, border-color 200ms ease;
+    }
+    .dark .cw-delete-action { color: #e7aab8; border-color: #68444f; background: transparent; }
+    @media (hover: hover) and (pointer: fine) {
+        .cw-delete-action:hover { background: #f8dfe6; border-color: #9e4158; }
+        .dark .cw-delete-action:hover { background: #3b2931; border-color: #a66f80; }
+    }
+    .cw-delete-action:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
     .cw-mobile-navigation {
         position: fixed;
         inset: 0;

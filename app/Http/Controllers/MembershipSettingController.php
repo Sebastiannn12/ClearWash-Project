@@ -55,9 +55,6 @@ class MembershipSettingController extends Controller
                 $validator->errors()->add('name', 'Required categories cannot be renamed.');
             }
 
-            if ($membershipCategory->isRequired() && ! $request->boolean('is_active')) {
-                $validator->errors()->add('is_active', 'Required categories must remain active.');
-            }
         });
 
         $validated = $validator->validateWithBag("category-{$membershipCategory->id}");
@@ -114,9 +111,6 @@ class MembershipSettingController extends Controller
                 $validator->errors()->add('name', 'Required membership levels cannot be renamed.');
             }
 
-            if ($membershipLevel->isRequired() && ! $request->boolean('is_active')) {
-                $validator->errors()->add('is_active', 'Required membership levels must remain active.');
-            }
         });
 
         $validated = $validator->validateWithBag("level-{$membershipLevel->id}");

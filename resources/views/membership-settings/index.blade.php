@@ -62,13 +62,13 @@
                 <form method="POST" action="{{ route('membership-settings.categories.update', $category) }}" class="cw-hover-surface cw-hover-settings rounded-2xl border border-brand-border bg-brand-canvas/40 p-5">
                     @csrf
                     @method('PATCH')
-                    <input type="hidden" name="is_active" value="{{ $category->isRequired() ? 1 : 0 }}">
+                    <input type="hidden" name="is_active" value="0">
 
                     <div class="flex items-center justify-between gap-3 border-b border-brand-border/70 pb-4">
                         <span class="text-xs font-bold uppercase tracking-[0.12em] text-brand-primary">Member category</span>
                         <div class="flex items-center gap-2">
                             @if ($category->isRequired())
-                                <span class="rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-bold text-brand-primary">Required</span>
+                                <span class="rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-bold text-brand-primary">Default</span>
                             @endif
                             <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $category->is_active ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">{{ $category->is_active ? 'Active' : 'Inactive' }}</span>
                         </div>
@@ -90,17 +90,15 @@
                             <input id="category-discount-{{ $category->id }}" name="discount_percentage" type="number" min="0" max="100" step="0.01" value="{{ $categoryBag->any() ? old('discount_percentage') : $category->discount_percentage }}" required class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-semibold outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">
                             @error('discount_percentage', 'category-'.$category->id)<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                         </div>
-                        @unless ($category->isRequired())
                             <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
                                 <input name="is_active" type="checkbox" value="1" @checked($categoryBag->any() ? old('is_active') : $category->is_active) class="size-4 rounded border-brand-border text-brand-primary focus:ring-brand-accent">
                                 Active and available for member assignment
                             </label>
-                        @endunless
                         @error('is_active', 'category-'.$category->id)<p class="text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                     </div>
 
-                    <div class="mt-5 flex flex-wrap justify-end gap-2 border-t border-brand-border/70 pt-4">
-                            <button type="button" onclick="document.getElementById('delete-category-{{ $category->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
+                    <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-brand-border/70 pt-4">
+                        <button type="button" onclick="document.getElementById('delete-category-{{ $category->id }}').showModal()" class="cw-delete-action" aria-label="Delete {{ $category->name }} category"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6l1 3h4M4 6h16M6 6l1 14h10l1-14M10 10v6m4-6v6"/></svg>Delete</button>
                         <button type="submit" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Save category</button>
                     </div>
                 </form>
@@ -163,13 +161,13 @@
                 <form method="POST" action="{{ route('membership-settings.levels.update', $level) }}" class="cw-hover-surface cw-hover-settings rounded-2xl border border-brand-border bg-brand-canvas/40 p-5 sm:p-6">
                     @csrf
                     @method('PATCH')
-                    <input type="hidden" name="is_active" value="{{ $level->isRequired() ? 1 : 0 }}">
+                    <input type="hidden" name="is_active" value="0">
 
                     <div class="flex items-center justify-between gap-3 border-b border-brand-border/70 pb-5">
                         <h3 class="min-w-0 truncate text-lg font-bold text-slate-950">{{ $level->name }}</h3>
                         <div class="flex items-center gap-2">
                             @if ($level->isRequired())
-                                <span class="rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-bold text-brand-primary">Required</span>
+                                <span class="rounded-full bg-brand-accent/10 px-2.5 py-1 text-xs font-bold text-brand-primary">Default</span>
                             @endif
                             <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $level->is_active ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">{{ $level->is_active ? 'Active' : 'Inactive' }}</span>
                         </div>
@@ -196,17 +194,15 @@
                             <textarea id="benefits-{{ $level->id }}" name="benefits" rows="3" maxlength="2000" class="mt-1.5 w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-border">{{ $levelBag->any() ? old('benefits') : $level->benefits }}</textarea>
                             @error('benefits', 'level-'.$level->id)<p class="mt-1 text-xs font-medium text-red-700">{{ $message }}</p>@enderror
                         </div>
-                        @unless ($level->isRequired())
                             <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 sm:col-span-2">
                                 <input name="is_active" type="checkbox" value="1" @checked($levelBag->any() ? old('is_active') : $level->is_active) class="size-4 rounded border-brand-border text-brand-primary focus:ring-brand-accent">
                                 Active and available for new transactions
                             </label>
-                        @endunless
                         @error('is_active', 'level-'.$level->id)<p class="text-xs font-medium text-red-700 sm:col-span-2">{{ $message }}</p>@enderror
                     </div>
 
-                    <div class="mt-5 flex flex-wrap justify-end gap-2 border-t border-brand-border/70 pt-4">
-                            <button type="button" onclick="document.getElementById('delete-level-{{ $level->id }}').showModal()" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
+                    <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-brand-border/70 pt-4">
+                        <button type="button" onclick="document.getElementById('delete-level-{{ $level->id }}').showModal()" class="cw-delete-action" aria-label="Delete {{ $level->name }} membership level"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6l1 3h4M4 6h16M6 6l1 14h10l1-14M10 10v6m4-6v6"/></svg>Delete</button>
                         <button type="submit" class="rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-bold text-white transition-[background-color,transform] duration-150 hover:bg-brand-sidebar active:scale-[0.98]">Save level</button>
                     </div>
                 </form>
